@@ -164,6 +164,7 @@ public class Compiler {
 	private void classDec() {
 		if ( lexer.token == Token.ID && lexer.getStringValue().equals("open") ) {
 			// open class
+			lexer.nextToken();
 		}
 		if ( lexer.token != Token.CLASS ) error("'class' expected");
 		lexer.nextToken();
@@ -399,6 +400,9 @@ public class Compiler {
 				else {
 					break;
 				}
+			}
+			if ( lexer.token == Token.SEMICOLON ) {
+				lexer.nextToken();
 			}
 		}
 
