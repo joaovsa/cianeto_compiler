@@ -19,6 +19,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import ast.MetaobjectAnnotation;
+import ast.PW;
 import ast.Program;
 
 public class Comp {
@@ -515,12 +516,12 @@ public class Comp {
 
 		try(BufferedReader in = new BufferedReader(
 				new InputStreamReader(
-						new FileInputStream(file), "UTF8"));) {
+						new FileInputStream(file), "Cp1252"));) {
 			in.read( input, 0, (int ) file.length() );
 		}
 		catch (UnsupportedEncodingException e)
 		{
-			outError.println("Encoding UTF8 was not supported for file '" + filename + "'");
+			outError.println("Encoding Cp1252 was not supported for file '" + filename + "'");
 			return null;
 		}
 		catch (Exception e)
@@ -824,26 +825,26 @@ public class Comp {
 			String className = javaFilename.substring(0, javaFilename.length() - dotJavaLength);
 
 			javaFilename = this.dirToJavaOutput + File.separator + javaFilename;
-//			PrintWriter printWriter = null;
-//			try ( FileOutputStream fos = new FileOutputStream(javaFilename) ) {
-//				printWriter = new PrintWriter(fos, true);
-//				PW pw = new PW(printWriter);
-//				try {
-//					program.genJava(pw);
-//				}
-//				catch( Throwable e ) {
-//					System.out.println("Exception '" + e.getClass().getName() + "' thrown while calling method 'genJava' on file '"
-//							+ javaFilename + "'");
-//					this.filesCompilerDidNotProducedJavaCode.add(javaFilename);
-//					return ;
-//				}
-//			}
-//			catch (Throwable e ) {
-//				System.out.println("Error when creating file '"
-//						+ javaFilename + "'");
-//				this.filesCompilerDidNotProducedJavaCode.add(javaFilename);
-//				return ;
-//			}
+			PrintWriter printWriter = null;
+			try ( FileOutputStream fos = new FileOutputStream(javaFilename) ) {
+				printWriter = new PrintWriter(fos, true);
+				PW pw = new PW(printWriter);
+				try {
+					program.genJava(pw);
+				}
+				catch( Throwable e ) {
+					System.out.println("Exception '" + e.getClass().getName() + "' thrown while calling method 'genJava' on file '"
+							+ javaFilename + "'");
+					this.filesCompilerDidNotProducedJavaCode.add(javaFilename);
+					return ;
+				}
+			}
+			catch (Throwable e ) {
+				System.out.println("Error when creating file '"
+						+ javaFilename + "'");
+				this.filesCompilerDidNotProducedJavaCode.add(javaFilename);
+				return ;
+			}
 
 			final Runtime rt = Runtime.getRuntime();
 			Process proc = null;

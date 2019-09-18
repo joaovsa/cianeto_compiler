@@ -39,16 +39,14 @@ public enum Token {
     MINUS_GT("->"),
     MULT("*"),
     NEQ("!="),
-    NEW("new"),
     NOT("!"),
-    NULL("null"),
+    NULL("nil"),
     OR("||"),
     OVERRIDE("override"),
     PLUS("+"),
     PLUSPLUS("++"),
     PRIVATE("private"),
     PUBLIC("public"),
-    READ("read"),
     REPEAT("repeat"),
     RETURN("return"),
     RIGHTCURBRACKET("}"),
@@ -60,10 +58,7 @@ public enum Token {
     TRUE("true"),
     UNTIL("until"),
     VAR("var"),
-    VOID("void"),
-    WHILE("while"),
-    WRITE("write"),
-    WRITELN("writeln");
+    WHILE("while");
 
 	Token(String name) {
 		this.name = name;
