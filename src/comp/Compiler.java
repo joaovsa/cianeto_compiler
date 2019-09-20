@@ -208,6 +208,11 @@ public class Compiler {
 			error(msg);
 		}
 	}
+	
+	private void checkSemiColon(String msg) {
+		if ( lexer.token != Token.SEMICOLON )
+			this.signalError.showError(msg, true);
+	}
 
 	private void methodDec() {
 		lexer.nextToken();
@@ -300,7 +305,7 @@ public class Compiler {
 			}
 		}
 		if ( checkSemiColon ) {
-			check(Token.SEMICOLON, "';' expected");
+			checkSemiColon("';' expected");
 			next();
 		}
 	}

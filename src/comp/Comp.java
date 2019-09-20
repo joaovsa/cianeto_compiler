@@ -1,6 +1,3 @@
-/* 	Joao Vitor de Sa Medeiros Santos	552585 *
- *	Vinicius Silva Salinas				726594 */
-
 package comp;
 import java.io.BufferedReader;
 import java.io.File;
@@ -214,6 +211,12 @@ public class Comp {
 			}
 		}
 		report.close();
+		try {
+			reportStream.close();
+		}
+		catch (IOException e) {
+			System.out.println("Error in closing the report file");
+		}
 		System.out.println("Cianeto compiler finished");
 
 	}
@@ -825,9 +828,9 @@ public class Comp {
 			String className = javaFilename.substring(0, javaFilename.length() - dotJavaLength);
 
 			javaFilename = this.dirToJavaOutput + File.separator + javaFilename;
-			PrintWriter printWriter = null;
-			try ( FileOutputStream fos = new FileOutputStream(javaFilename) ) {
-				printWriter = new PrintWriter(fos, true);
+
+			try ( FileOutputStream fos = new FileOutputStream(javaFilename);
+					PrintWriter printWriter = new PrintWriter(fos, true) ) {
 				PW pw = new PW(printWriter);
 				try {
 					program.genJava(pw);
