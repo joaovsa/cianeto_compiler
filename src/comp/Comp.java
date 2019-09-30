@@ -1,3 +1,6 @@
+/* 	Joao Vitor de Sa Medeiros Santos	552585 *
+ *	Vinicius Silva Salinas				726594 */
+
 package comp;
 import java.io.BufferedReader;
 import java.io.File;
@@ -833,6 +836,7 @@ public class Comp {
 					PrintWriter printWriter = new PrintWriter(fos, true) ) {
 				PW pw = new PW(printWriter);
 				try {
+					program.setMainJavaClassName(className);
 					program.genJava(pw);
 				}
 				catch( Throwable e ) {
@@ -942,8 +946,8 @@ public class Comp {
 						++lineCount;
 					}
 				}
-				String result = removeExtraSpacesFirstLine(firstLine);
-				alloutput = removeExtraSpaces(alloutput);
+				String result = removeExtraSpacesFirstLine(firstLine).trim();
+				alloutput = removeExtraSpaces(alloutput).trim();
 
 
 				if ( result.equals(alloutput) ) {
