@@ -294,8 +294,7 @@ public class Compiler {
 		default:
 			if ( lexer.token == Token.ID && lexer.getStringValue().equals("Out") ) {
 				writeStat();
-			}
-			else {
+			} else {
 				expr();
 				if( lexer.token == Token.ASSIGN ) {
 					next();
@@ -304,6 +303,9 @@ public class Compiler {
 			}
 		}
 		if ( checkSemiColon ) {
+			if ( lexer.token == Token.RIGHTPAR ) {
+				error("')' unexpected");
+			}
 			checkSemiColon("';' expected");
 			next();
 		}
@@ -390,8 +392,10 @@ public class Compiler {
 		check(Token.DOT, "a '.' was expected after 'Out'");
 		next();
 		check(Token.IDCOLON, "'print:' or 'println:' was expected after 'Out.'");
-		String printName = lexer.getStringValue();
 		next();
+		String printName = lexer.getStringValue();
+		if ( lexer.token == Token.SEMICOLON )
+			error("Command ' Out.print' without arguments");
 		expr();
 		while ( lexer.token == Token.COMMA ) {
 			next();
@@ -543,8 +547,12 @@ public class Compiler {
 					}
 				}
 			}
+			else if ( lexer.token == Token.IDCOLON && lexer.getStringValue().equals("print:") ) {
+				error("Missing 'Out.'");
+			}
 			else {
 				error("Expression expected");
+				//error("Statement expected");
 			}
 		}
 	}
