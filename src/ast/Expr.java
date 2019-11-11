@@ -11,5 +11,6 @@ abstract public class Expr extends Statement {
 	}
 
       // new method: the type of the expression
+	//verificar se está na tabela de variaveis
     abstract public Type getType();
 }

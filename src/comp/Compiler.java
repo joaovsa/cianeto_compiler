@@ -10,12 +10,23 @@ import ast.MetaobjectAnnotation;
 import ast.Program;
 import ast.Statement;
 import ast.TypeCianetoClass;
+import ast.TypeInt;
+import ast.TypeNull;
+import ast.TypeString;
+import ast.TypeUndefined;
+import ast.CompositeExpr;
+import ast.Expr;
+import ast.Type;
+import ast.TypeBoolean;
 import lexer.Lexer;
 import lexer.Token;
 
+
 public class Compiler {
 
-	public Compiler() { }
+	public Compiler() { 
+		
+	}
 
 	// compile must receive an input with an character less than
 	// p_input.lenght
@@ -180,7 +191,9 @@ public class Compiler {
 
 	private void memberList() {
 		while ( true ) {
+			//optional inside method
 			qualifier();
+			
 			if ( lexer.token == Token.VAR ) {
 				fieldDec();
 			}
@@ -227,6 +240,7 @@ public class Compiler {
 		else {
 			error("An identifier or identifer: was expected after 'func'");
 		}
+		
 		if ( lexer.token == Token.MINUS_GT ) {
 			// method declared a return type
 			lexer.nextToken();
@@ -240,6 +254,9 @@ public class Compiler {
 		if ( lexer.token != Token.RIGHTCURBRACKET ) {
 			error("'}' expected");
 		}
+		//clears local table after processing it
+		symbolTable.clearLocal();
+		
 		next();
 	}
 
@@ -262,7 +279,7 @@ public class Compiler {
 		}
 	}
 
-	private void statement() {
+	private Statement statement() {
 		boolean checkSemiColon = true;
 		switch ( lexer.token ) {
 		case IF:
@@ -295,11 +312,25 @@ public class Compiler {
 			if ( lexer.token == Token.ID && lexer.getStringValue().equals("Out") ) {
 				writeStat();
 			} else {
-				expr();
+				Expr leftside = expr();
 				if( lexer.token == Token.ASSIGN ) {
+					Token t = lexer.token;
+					String possible_var;
 					next();
-					expr();
+					
+					possible_var = lexer.getStringValue();
+					Expr rightside = expr();
+					if (symbolTable.getLocal(possible_var) != rightside.getType()) {
+						String str= "'"+symbolTable.getLocal(possible_var)+"' cannot be assigned to '"+rightside.getType()+"'";
+						error(str);
+						//ou deveria ser check
+					}
+					//aux func, not in AST
+					CompositeExpr cexp = new CompositeExpr(leftside, t, rightside);
+					return cexp;
 				}
+			//TODO: change
+			return null;
 			}
 		}
 		if ( checkSemiColon ) {
@@ -309,14 +340,21 @@ public class Compiler {
 			checkSemiColon("';' expected");
 			next();
 		}
+		//TODO: change
+		return null;
 	}
 
 	private void localDec() {
+		//armazena tipos de uma sequencia de declaração de variável
+		Type t;
+		
 		next();
-		type();
+		t = type();
 		check(Token.ID, "A variable name was expected");
 		while ( lexer.token == Token.ID ) {
+			symbolTable.putLocal(Token.ID.toString(), t);
 			next();
+			
 			if ( lexer.token == Token.COMMA ) {
 				next();
 				check(Token.ID, "A variable name was expected");
@@ -326,6 +364,7 @@ public class Compiler {
 			}
 		}
 		if ( lexer.token == Token.ASSIGN ) {
+			//TODO: check type after declaration
 			next();
 			// check if there is just one variable
 			expr();
@@ -403,47 +442,70 @@ public class Compiler {
 		}
 	}
 
-	private void expr() {
-		simpleExpr();
+	private Expr expr() {
+		Expr expr;
+		Expr left;
+		Expr right;
+		Token t;
+		
+		left = simpleExpr();
 		if ( lexer.token == Token.EQ || lexer.token == Token.LT || lexer.token == Token.GT ||
 				lexer.token == Token.GE || lexer.token == Token.LE || lexer.token == Token.NEQ ) {
+			t = lexer.token;
 			next();
-			simpleExpr();
+			right= simpleExpr();
+			expr = new CompositeExpr(left, t, right);
+			
 		}
+		else {
+			
+			expr = left;
+		}
+		return expr;
 	}
 	
-	private void simpleExpr() {
-		sumSubExpr();
+	private Expr simpleExpr() {
+		//TODO: fix returns
+		Expr e;
+		e = sumSubExpr();
 		while ( lexer.token == Token.PLUSPLUS ) {
 			next();
-			sumSubExpr();
+			e = sumSubExpr();
 		}
+		return e;
 	}
 	
-	private void sumSubExpr() {
-		term();
+	private Expr sumSubExpr() {
+		//TODO: fix returns
+		Expr e;
+		e = term();
 		while ( lexer.token == Token.PLUS || lexer.token == Token.MINUS || lexer.token == Token.OR ) {
 			next();
-			term();
+			e = term();
 		}
+		return e;
 	}
 
-	private void term() {
-		signalFactor();
+	private Expr term() {
+		//TODO: fix return, maybe signal factor list?
+		Expr e;
+		e =  signalFactor();
 		while ( lexer.token == Token.MULT || lexer.token == Token.DIV || lexer.token == Token.AND ) {
 			next();
-			signalFactor();
+			e = signalFactor();
 		}
+		return e;
 	}
 
-	private void signalFactor() {
+	private Expr signalFactor() {
 		if( lexer.token == Token.PLUS || lexer.token == Token.MINUS ) {
 			next();
 		}
-		factor();
+		return factor();
 	}
 	
-	private void factor() {
+	private Expr factor() {
+		int numval;
 		switch ( lexer.token ) {
 		case LEFTPAR:
 			next();
@@ -462,7 +524,10 @@ public class Compiler {
 		default:
 			if ( lexer.token == Token.LITERALINT || lexer.token == Token.LITERALSTRING || lexer.token == Token.FALSE 
 					|| lexer.token == Token.TRUE ) {
+				numval = lexer.getNumberValue();
 				next();
+				return new LiteralInt(numval);
+				
 			}
 			else if ( lexer.token == Token.ID && lexer.getStringValue().equals("In") ) {
 				next();
@@ -553,8 +618,10 @@ public class Compiler {
 			else {
 				error("Expression expected");
 				//error("Statement expected");
-			}
+			}		
 		}
+		//TODO: fix AST returns
+		return null;
 	}
 	
 	private void fieldDec() {
@@ -583,17 +650,28 @@ public class Compiler {
 
 	}
 
-	private void type() {
-		if ( lexer.token == Token.INT || lexer.token == Token.BOOLEAN || lexer.token == Token.STRING ) {
-			next();
+	private Type type() {
+		Type tp;		
+		switch(lexer.token){
+			case INT:
+				tp = new TypeInt();
+				break;
+			case BOOLEAN:
+				tp = new TypeBoolean();
+				break;
+			case STRING:
+				tp = new TypeString();
+				break;
+			case NULL:
+				//TODO: verify if null is creatable
+				tp = new TypeNull();
+			default:
+				tp = new TypeUndefined();
+				this.error("A type was expected");
 		}
-		else if ( lexer.token == Token.ID ) {
-			next();
-		}
-		else {
-			this.error("A type was expected");
-		}
-
+		//iterates token
+		next();
+		return tp;
 	}
 
 
