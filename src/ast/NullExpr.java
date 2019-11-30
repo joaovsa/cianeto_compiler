@@ -3,14 +3,17 @@
 
 package ast;
 
-public class NullExpr extends Expr {
+public class NullExpr extends Factor {
     
    public void genC( PW pw, boolean putParenthesis ) {
       pw.printIdent("NULL");
    }
    
    public Type getType() {
-      //# corrija
-      return null;
+      return Type.nullType;
    }
+
+	public void genJava(PW pw) {
+		pw.print("null");
+	}
 }
