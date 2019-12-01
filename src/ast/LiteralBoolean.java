@@ -3,7 +3,7 @@
 
 package ast;
 
-public class LiteralBoolean extends Expr {
+public class LiteralBoolean extends Factor {
 
     public LiteralBoolean( boolean value ) {
         this.value = value;
@@ -24,5 +24,10 @@ public class LiteralBoolean extends Expr {
     public static LiteralBoolean False = new LiteralBoolean(false);
 
     private boolean value;
+
+	@Override
+	public void genJava(PW pw) {
+		pw.print( value ? "true" : "false" );
+	}
 
 }

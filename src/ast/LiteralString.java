@@ -3,7 +3,7 @@
 
 package ast;
 
-public class LiteralString extends Expr {
+public class LiteralString extends Factor {
     
     public LiteralString( String literalString ) { 
         this.literalString = literalString;
@@ -17,6 +17,11 @@ public class LiteralString extends Expr {
     public Type getType() {
         return Type.stringType;
     }
+    
+	public void genJava(PW pw) {
+		//pw.print(literalString);
+		pw.print("\""+ literalString +"\"");
+	}
     
     private String literalString;
 }

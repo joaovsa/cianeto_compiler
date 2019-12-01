@@ -3,7 +3,7 @@
 
 package ast;
 
-public class LiteralInt extends Expr {
+public class LiteralInt extends Factor {
     
     public LiteralInt( int value ) { 
         this.value = value;
@@ -21,4 +21,8 @@ public class LiteralInt extends Expr {
     }
     
     private int value;
+
+	public void genJava(PW pw) {
+		pw.print("" + value);
+	}
 }

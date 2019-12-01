@@ -784,8 +784,6 @@ public class Compiler {
 
 	private LiteralInt literalInt() {
 
-		LiteralInt e = null;
-
 		// the number value is stored in lexer.getToken().value as an object of
 		// Integer.
 		// Method intValue returns that value as an value of type int.
