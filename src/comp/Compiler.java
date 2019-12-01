@@ -5,11 +5,8 @@ package comp;
 
 import java.io.PrintWriter;
 import java.util.ArrayList;
-import ast.LiteralInt;
-import ast.MetaobjectAnnotation;
-import ast.Program;
-import ast.Statement;
-import ast.TypeCianetoClass;
+
+import ast.*;
 import ast.TypeInt;
 import ast.TypeNull;
 import ast.TypeString;

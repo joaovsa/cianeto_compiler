@@ -4,6 +4,7 @@
 package ast;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 
 /** This class represents a metaobject annotation as <code>{@literal @}ce(...)</code> in <br>
  * <code>
