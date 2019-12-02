@@ -209,7 +209,11 @@ public class Compiler {
 	}
 
 	private void error(String msg) {
-		this.signalError.showError(msg);
+		try{
+			this.signalError.showError(msg);
+		} catch (Exception e) {
+			// CompilerError happening here :(			
+		}
 	}
 
 
@@ -359,10 +363,27 @@ public class Compiler {
 	private LocalDec localDec() {
 		next();
 		String type = type();
+		String msg;
+		
+		//semantic typeNotFound
+		if(!type.equals(Token.INT.toString().toLowerCase()) &&
+				!type.equals(Token.BOOLEAN.toString().toLowerCase()) &&
+				!type.equals(Token.STRING.toString().toLowerCase())) {
+			//checkglobal			
+			if(symbolTable.getClass(type)==null) {
+				//error
+				msg = "Type '" + type + "' was not found";
+				error(msg);
+			}
+			
+		}
+		
 		ArrayList<String> idList = new ArrayList<>();
 		check(Token.ID, "A variable name was expected");
 		while ( lexer.token == Token.ID ) {
 			idList.add(lexer.getStringValue());
+
+			
 			next();
 			if ( lexer.token == Token.COMMA ) {
 				next();
@@ -477,6 +498,7 @@ public class Compiler {
 	}
 	
 	private SimpleExpr simpleExpr() {
+
 		ArrayList<SumSubExpr> sse = new ArrayList<>();
 		sse.add(sumSubExpr());
 		while ( lexer.token == Token.PLUSPLUS ) {
@@ -487,13 +509,72 @@ public class Compiler {
 	}
 	
 	private SumSubExpr sumSubExpr() {
+		//Term { LowOperator Term }
+		String exprtype = "";
+		String op = "";
+		Term t;
+		SignalFactor sf;
 		ArrayList<Term> term = new ArrayList<>();
 		ArrayList<String> operator = new ArrayList<>();
-		term.add(term());
-		while ( lexer.token == Token.PLUS || lexer.token == Token.MINUS || lexer.token == Token.OR ) {
-			operator.add(lexer.token.toString());
+		t = term();
+		term.add(t);
+		sf = t.getFirstSf();
+		
+		if(sf.getFactor() instanceof ast.LiteralBoolean)
+			exprtype = Token.BOOLEAN.toString();
+		else if(sf.getFactor() instanceof ast.LiteralString)
+			exprtype = Token.STRING.toString();
+		else if(sf.getFactor() instanceof ast.LiteralInt)
+			exprtype = Token.INT.toString();
+		else{
+			exprtype = Token.NULL.toString();
+			//can be object too
+		}
+		
+		//semantic
+		if(lexer.token == Token.PLUS || lexer.token == Token.MINUS || 
+				lexer.token == Token.DIV || lexer.token == Token.MULT || lexer.token == Token.PLUSPLUS) {
+			
+			if(sf.getFactor() instanceof ast.LiteralBoolean) {
+				error("type boolean does not support operation '"+lexer.token.toString()+"'");
+			}
+		}
+		
+		while( lexer.token == Token.PLUS || lexer.token == Token.MINUS ||
+				lexer.token == Token.OR || lexer.token == Token.AND ) {
+			op = lexer.token.toString();
+			operator.add(op);
 			next();
-			term.add(term());
+			t = term();
+			term.add(t);
+			sf = t.getFirstSf();
+			
+			//semantic
+			if(sf.getFactor() instanceof ast.LiteralBoolean)
+				exprtype = Token.BOOLEAN.toString();
+			else if(sf.getFactor() instanceof ast.LiteralString)
+				exprtype = Token.STRING.toString();
+			else if(sf.getFactor() instanceof ast.LiteralInt)
+				exprtype = Token.INT.toString();
+			else{
+				exprtype = Token.NULL.toString();
+				//can be object too
+			}
+			
+			
+			
+			if(sf.getFactor() instanceof ast.LiteralBoolean &&
+					lexer.token == Token.PLUS || lexer.token == Token.MINUS) {
+				error("operator '"+lexer.token.toString()+"' of '"+
+						exprtype+"' expects an '"+exprtype+"' value");
+			} else if (sf.getFactor() instanceof ast.LiteralInt &&
+					//wrongly getting outter Relation
+					lexer.token != Token.PLUS || lexer.token != Token.MINUS ||
+					lexer.token != Token.DIV || lexer.token != Token.MULT) {
+				error("type '"+exprtype.toLowerCase()+"' does not support operator '"+
+					op+"'");
+			}
+					
 		}
 		return new SumSubExpr(term, operator);
 	}
@@ -803,6 +884,7 @@ public class Compiler {
 	}
 
 	private SymbolTable			symbolTable;
+	
 	private ArrayList<String>	funcList = new ArrayList<>();
 	private Lexer				lexer;
 	private ErrorSignaller		signalError;

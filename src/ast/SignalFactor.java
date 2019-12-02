@@ -9,7 +9,9 @@ public class SignalFactor extends Expr {
 		this.factor = factor;
 		this.signal = signal;
 	}
-	
+	public Factor getFactor() {
+		return this.factor;
+	}
 	@Override
 	public void genC(PW pw, boolean putParenthesis) {
 		// TODO Auto-generated method stub

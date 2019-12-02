@@ -35,11 +35,15 @@ public class ErrorSignaller {
     public void showError( String strMessage, boolean goPreviousToken ) {
         // is goPreviousToken is true, the error is signalled at the line of the
         // previous token, not the last one.
-        if ( goPreviousToken )
-           showError( strMessage, lexer.getLineBeforeLastToken(),
-                 lexer.getLineNumberBeforeLastToken() );
-        else
-           showError( strMessage, lexer.getCurrentLine(), lexer.getLineNumber() );
+        try{
+	    	if ( goPreviousToken )
+	           showError( strMessage, lexer.getLineBeforeLastToken(),
+	                 lexer.getLineNumberBeforeLastToken() );
+	        else
+	           showError( strMessage, lexer.getCurrentLine(), lexer.getLineNumber() );
+        } catch (Exception e) {
+			// TODO: handle exception
+		}
     }
 
 

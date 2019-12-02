@@ -13,6 +13,10 @@ public class Term extends Expr {
 		this.operator = operator;
 	}
 	
+	public SignalFactor getFirstSf() {
+		return this.sf.get(0);
+	}
+	
 	@Override
 	public void genC(PW pw, boolean putParenthesis) {
 		// TODO Auto-generated method stub

@@ -6,22 +6,45 @@ import ast.Type;
 import java.util.HashMap;
 
 public class SymbolTable {
-	public HashMap<String, Type> localTable;
+	public HashMap<String, String> localTable;
+	public HashMap<String, String> classTable;
 	
 	public SymbolTable(){
-		localTable = new HashMap<String, Type>();
+		classTable = new HashMap<String, String>();
+		localTable = new HashMap<String, String>();
 	}
 	
-	public void putLocal(String s,Type t) {
+	public void putLocal(String s,String t) {
 		this.localTable.put(s, t);
 	}
 	
-	public Type getLocal(String s) {
+	public String getLocal(String s) {
 		return this.localTable.get(s);
 	}
 	public boolean clearLocal() {
 		try {
 			this.localTable.clear();
+			return true;
+		}
+		catch (Exception e) {
+			// TODO: handle exception
+			return false;
+		}
+			
+	}
+	
+	public void putClass(String s,String t) {
+		this.classTable.put(s, t);
+	}
+	
+	public String getClass(String s) {	
+		if(this.classTable.get(s)==null)
+			return null;
+		return this.classTable.get(s);
+	}
+	public boolean clearClass() {
+		try {
+			this.classTable.clear();
 			return true;
 		}
 		catch (Exception e) {
