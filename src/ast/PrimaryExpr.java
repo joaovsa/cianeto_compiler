@@ -8,8 +8,8 @@ import java.util.Iterator;
 
 public class PrimaryExpr extends Factor {
 
-	public PrimaryExpr(boolean self, boolean sup, String id1, boolean funcId1,
-			String id2,  boolean funcId2, String idColon, ArrayList<Expr> exprList) {
+	public PrimaryExpr(boolean self, boolean sup, String id1, String id1Type, boolean funcId1,
+			String id2, String id2Type,  boolean funcId2, String idColon, ArrayList<Expr> exprList) {
 		this.self = self;
 		this.sup = sup;
 		this.id1 = id1;
@@ -18,6 +18,8 @@ public class PrimaryExpr extends Factor {
 		this.funcId2 = funcId2;
 		this.idColon = idColon;
 		this.exprList = exprList;
+		this.id1Type = id1Type;
+		this.id2Type = id2Type;
 	}
 	
 	@Override
@@ -27,10 +29,22 @@ public class PrimaryExpr extends Factor {
 	}
 
 	@Override
-	public Type getType() {
-		// TODO Auto-generated method stub
-		return null;
-	}
+	public Type getType() {		
+		try {
+			if(this.id1Type.equals( "boolean"))
+				return Type.booleanType;
+			else if(this.id1Type.equals("int"))
+				return Type.intType;
+			else if(this.id1Type.equals("string"))
+				return Type.stringType;
+			else
+				return null;
+		}
+		catch (NullPointerException e) {
+			//TODO: descobrir o motivo do nullpointer
+			return null;
+		}
+	}	
 
 	@Override
 	public void genJava(PW pw) {
@@ -104,4 +118,6 @@ public class PrimaryExpr extends Factor {
 	private boolean funcId2;
 	private String idColon;
 	private ArrayList<Expr> exprList;
+	private String id1Type;
+	private String id2Type;
 }

@@ -16,8 +16,8 @@ public class Expression extends Expr {
 	}
 
 	@Override
-	public Type getType() {
-		return null;
+	public Type getType() {				
+		return this.se1.getType();
 	}
 
 	@Override

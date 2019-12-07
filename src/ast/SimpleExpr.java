@@ -18,7 +18,10 @@ public class SimpleExpr extends Expr {
 
 	@Override
 	public Type getType() {
-		return null;
+		Expr first;
+		first = this.sse.get(0);
+		return first.getType();
+		
 	}
 
 	@Override

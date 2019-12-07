@@ -27,7 +27,7 @@ public class Term extends Expr {
 	@Override
 	public Type getType() {
 		// TODO Auto-generated method stub
-		return null;
+		return this.sf.get(0).getType();
 	}
 
 	@Override

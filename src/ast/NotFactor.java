@@ -18,7 +18,7 @@ public class NotFactor extends Factor {
 	@Override
 	public Type getType() {
 		// TODO Auto-generated method stub
-		return null;
+		return this.factor.getType();
 	}
 
 	@Override

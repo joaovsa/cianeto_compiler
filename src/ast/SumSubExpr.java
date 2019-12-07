@@ -19,7 +19,7 @@ public class SumSubExpr extends Expr {
 
 	@Override
 	public Type getType() {
-		return null;
+		return term.get(0).getType();
 	}
 
 	@Override

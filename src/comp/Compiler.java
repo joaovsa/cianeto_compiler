@@ -264,6 +264,7 @@ public class Compiler {
 		if ( lexer.token != Token.RIGHTCURBRACKET ) {
 			error("'}' expected");
 		}
+		symbolTable.clearLocal();
 		next();
 		MethodList methodDec = new MethodList(priv, name, rt_type, paramDec, statementList, hasScanner);
 		if (hasScanner == true)
@@ -302,7 +303,7 @@ public class Compiler {
 		while ( lexer.token != Token.RIGHTCURBRACKET && lexer.token != Token.END ) {
 			stat = statement();
 			if (stat != null)
-			statementList.add(stat);
+				statementList.add(stat);
 		}
 		return statementList;
 	}
@@ -383,8 +384,8 @@ public class Compiler {
 		check(Token.ID, "A variable name was expected");
 		while ( lexer.token == Token.ID ) {
 			idList.add(lexer.getStringValue());
-
 			
+			symbolTable.putLocal(lexer.getStringValue(), type);			
 			next();
 			if ( lexer.token == Token.COMMA ) {
 				next();
@@ -466,7 +467,10 @@ public class Compiler {
 		return ifStat;
 	}
 
+	//ERR-SEM-14
 	private WriteStat writeStat() {
+		Expr e;
+		String basictype;
 		next();
 		check(Token.DOT, "a '.' was expected after 'Out'");
 		next();
@@ -478,7 +482,21 @@ public class Compiler {
 		if ( lexer.token == Token.SEMICOLON )
 			error("Command ' Out.print' without arguments");
 		ArrayList<Expr> expr = new ArrayList<>();
-		expr.add(expr());
+		e = expr();
+		
+		//semantic
+		if(e.getType() != Type.stringType) {
+			if(e.getType() == Type.booleanType)
+				basictype = "boolean";
+			else if (e.getType() == Type.intType)
+				basictype = "int";
+			else
+				basictype = "class or method";
+				
+			//System.out.println(basictype);
+			error("Attempt to print a "+basictype+ " expression");
+		}
+		expr.add(e);
 		while ( lexer.token == Token.COMMA ) {
 			next();
 			expr.add(expr());
@@ -487,10 +505,11 @@ public class Compiler {
 	}
 
 	private Expr expr() {
+		String relation = null;
 		Expr se1 = simpleExpr();
 		if ( lexer.token == Token.EQ || lexer.token == Token.LT || lexer.token == Token.GT ||
 				lexer.token == Token.GE || lexer.token == Token.LE || lexer.token == Token.NEQ ) {
-			String relation = lexer.token.toString();
+			relation = lexer.token.toString();
 			next();
 			Expr se2 = simpleExpr();
 			return new Expression(se1, relation, se2);
@@ -613,15 +632,26 @@ public class Compiler {
 			next();
 			return new ExprPar(expr);
 		case NOT:
+			String basictype;
 			next();
 			Expr factor = factor();
 			//TODO: check if we need factor on AST
+			//semantic
+			if(factor.getType() != Type.booleanType) {
+				if(factor.getType() == Type.stringType)
+					basictype = "string";
+				else if (factor.getType() == Type.intType)
+					basictype = "int";
+				else
+					basictype = "class or method";
+				error("Operator '!' does not accepts '"+basictype+"' values");
+			}
 			return new NotFactor(factor);
 		case NULL:
 			next();
 			return new NullExpr();
 		default:
-			String id1 = null, id2 = null, idColon = null;
+			String id1 = null, id2 = null, idColon = null, id1Type = null, id2Type=null;
 			boolean sup = false, self = false, primary = false, funcId1 = false, funcId2 = false;
 			ArrayList<Expr> exprList = new ArrayList<>();
 			if ( lexer.token == Token.LITERALINT ) {
@@ -665,6 +695,7 @@ public class Compiler {
 			else if ( lexer.token == Token.ID ) {
 				primary = true;
 				id1 = lexer.getStringValue();
+				id1Type = symbolTable.getLocal(id1);
 				if ( funcList.contains(id1) )
 					funcId1 = true;
 				next();
@@ -686,6 +717,7 @@ public class Compiler {
 					}
 					else if ( lexer.token == Token.ID ) {
 						id2 = lexer.getStringValue();
+						id2Type = symbolTable.getLocal(id2);
 						if ( funcList.contains(id2) )
 							funcId2 = true;
 						next();
@@ -701,6 +733,7 @@ public class Compiler {
 				next();
 				if ( lexer.token == Token.ID ) {
 					id1 = lexer.getStringValue();
+					id1Type = symbolTable.getLocal(id1);
 					if ( funcList.contains(id1) )
 						funcId1 = true;
 					next();
@@ -732,6 +765,7 @@ public class Compiler {
 					}
 					else if ( lexer.token == Token.ID ) {
 						id1 = lexer.getStringValue();
+						id1Type = symbolTable.getLocal(id1);
 						if ( funcList.contains(id1) )
 							funcId1 = true;
 						next();
@@ -748,6 +782,7 @@ public class Compiler {
 							}
 							else if ( lexer.token == Token.ID ) {
 								id2 = lexer.getStringValue();
+								id2Type = symbolTable.getLocal(id1);
 								if ( funcList.contains(id2) )
 									funcId2 = true;
 								next();
@@ -764,7 +799,7 @@ public class Compiler {
 				//error("Statement expected");
 			}
 			if ( primary == true ) 
-				return new PrimaryExpr(self, sup, id1, funcId1, id2, funcId2, idColon, exprList);
+				return new PrimaryExpr(self, sup, id1, id1Type, funcId1, id2, id2Type, funcId2, idColon, exprList);
 		}
 		return null;
 	}
@@ -799,8 +834,8 @@ public class Compiler {
 
 	private String type() {
 		String type = lexer.getStringValue();
+		type = type.toLowerCase();
 		if ( lexer.token == Token.INT || lexer.token == Token.BOOLEAN ) {
-			type = type.toLowerCase();
 			next();
 		}
 		else if ( lexer.token == Token.STRING ) {
