@@ -340,6 +340,7 @@ public class Compiler {
 			statement = assertStat();
 			break;
 		default:
+			String type1,type2;
 			if ( lexer.token == Token.ID && lexer.getStringValue().equals("Out") ) {
 				statement = writeStat();
 			} else {
@@ -349,6 +350,16 @@ public class Compiler {
 					next();
 					expr2 = expr();
 				}
+				
+				//semantic
+				//TODO: fix for subclasses
+				if(expr1.getType() != expr2.getType()){
+					type1= Type.getStringType(expr1.getType());
+					type2= Type.getStringType(expr2.getType());
+					error("'"+type2+"' cannot be assigned to '" + type1 +"'");
+				}
+					
+					
 				statement = new AssignExpr(expr1, expr2);
 			}
 		}
@@ -486,12 +497,7 @@ public class Compiler {
 		
 		//semantic
 		if(e.getType() != Type.stringType) {
-			if(e.getType() == Type.booleanType)
-				basictype = "boolean";
-			else if (e.getType() == Type.intType)
-				basictype = "int";
-			else
-				basictype = "class or method";
+			basictype = Type.getStringType(e.getType());
 				
 			//System.out.println(basictype);
 			error("Attempt to print a "+basictype+ " expression");
@@ -638,12 +644,7 @@ public class Compiler {
 			//TODO: check if we need factor on AST
 			//semantic
 			if(factor.getType() != Type.booleanType) {
-				if(factor.getType() == Type.stringType)
-					basictype = "string";
-				else if (factor.getType() == Type.intType)
-					basictype = "int";
-				else
-					basictype = "class or method";
+				basictype = Type.getStringType(factor.getType());
 				error("Operator '!' does not accepts '"+basictype+"' values");
 			}
 			return new NotFactor(factor);
