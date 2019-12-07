@@ -8,7 +8,7 @@ import java.util.Iterator;
 
 public class WhileStat extends Statement {
 
-	public WhileStat(Expression expr, ArrayList<Statement> statList) {
+	public WhileStat(Expr expr, ArrayList<Statement> statList) {
 		this.expr = expr;
 		this.statList = statList;
 	}
@@ -38,6 +38,6 @@ public class WhileStat extends Statement {
 		pw.printlnIdent("}");
 	}
 	
-	private Expression expr;
+	private Expr expr;
 	private ArrayList<Statement> statList;
 }

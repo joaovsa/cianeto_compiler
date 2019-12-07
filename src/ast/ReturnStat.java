@@ -5,7 +5,7 @@ package ast;
 
 public class ReturnStat extends Statement {
 
-	public ReturnStat(Expression expr) {
+	public ReturnStat(Expr expr) {
 		this.expr = expr;
 	}
 
@@ -22,5 +22,5 @@ public class ReturnStat extends Statement {
 		pw.println(";");
 	}
 	
-	private Expression expr;
+	private Expr expr;
 }

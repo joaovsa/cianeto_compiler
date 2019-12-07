@@ -308,6 +308,8 @@ public class Compiler {
 	}
 
 	private Statement statement() {
+		//TODO: change to member
+		String var;
 		boolean checkSemiColon = true;
 		Statement statement = null;
 		switch ( lexer.token ) {
@@ -341,8 +343,8 @@ public class Compiler {
 			if ( lexer.token == Token.ID && lexer.getStringValue().equals("Out") ) {
 				statement = writeStat();
 			} else {
-				Expression expr1 = expr();
-				Expression expr2 = null;
+				Expr expr1 = expr();
+				Expr expr2 = null;
 				if( lexer.token == Token.ASSIGN ) {
 					next();
 					expr2 = expr();
@@ -393,7 +395,7 @@ public class Compiler {
 				break;
 			}
 		}
-		Expression expr = null;
+		Expr expr = null;
 		if ( lexer.token == Token.ASSIGN ) {
 			next();
 			// check if there is just one variable
@@ -410,7 +412,7 @@ public class Compiler {
 		}
 		check(Token.UNTIL, "missing keyword 'until'");
 		next();
-		Expression expr = expr();
+		Expr expr = expr();
 		return new RepeatStat(expr, statList);
 	}
 
@@ -421,13 +423,13 @@ public class Compiler {
 
 	private ReturnStat returnStat() {
 		next();
-		Expression expr = expr();
+		Expr expr = expr();
 		return new ReturnStat(expr);
 	}
 
 	private WhileStat whileStat() {
 		next();
-		Expression expr = expr();
+		Expr expr = expr();
 		ArrayList<Statement> statList = new ArrayList<>();
 		check(Token.LEFTCURBRACKET, "missing '{' after the 'while' expression");
 		next();
@@ -441,7 +443,7 @@ public class Compiler {
 
 	private IfStat ifStat() {
 		next();
-		Expression cond = expr();
+		Expr cond = expr();
 		check(Token.LEFTCURBRACKET, "'{' expected after the 'if' expression");
 		next();
 		ArrayList<Statement> stat = new ArrayList<>();
@@ -476,7 +478,7 @@ public class Compiler {
 		next();
 		if ( lexer.token == Token.SEMICOLON )
 			error("Command ' Out.print' without arguments");
-		ArrayList<Expression> expr = new ArrayList<>();
+		ArrayList<Expr> expr = new ArrayList<>();
 		expr.add(expr());
 		while ( lexer.token == Token.COMMA ) {
 			next();
@@ -485,19 +487,19 @@ public class Compiler {
 		return new WriteStat(println, expr);
 	}
 
-	private Expression expr() {
-		SimpleExpr se1 = simpleExpr();
+	private Expr expr() {
+		Expr se1 = simpleExpr();
 		if ( lexer.token == Token.EQ || lexer.token == Token.LT || lexer.token == Token.GT ||
 				lexer.token == Token.GE || lexer.token == Token.LE || lexer.token == Token.NEQ ) {
 			String relation = lexer.token.toString();
 			next();
-			SimpleExpr se2 = simpleExpr();
+			Expr se2 = simpleExpr();
 			return new Expression(se1, relation, se2);
 		}
 		return new Expression(se1, null, null);
 	}
 	
-	private SimpleExpr simpleExpr() {
+	private Expr simpleExpr() {
 
 		ArrayList<SumSubExpr> sse = new ArrayList<>();
 		sse.add(sumSubExpr());
@@ -620,7 +622,7 @@ public class Compiler {
 		default:
 			String id1 = null, id2 = null, idColon = null;
 			boolean sup = false, self = false, primary = false, funcId1 = false, funcId2 = false;
-			ArrayList<Expression> exprList = new ArrayList<>();
+			ArrayList<Expr> exprList = new ArrayList<>();
 			if ( lexer.token == Token.LITERALINT ) {
 				int valor = lexer.getNumberValue();
 				next();
@@ -844,7 +846,7 @@ public class Compiler {
 
 		lexer.nextToken();
 		int lineNumber = lexer.getLineNumber();
-		Expression expr = expr();
+		Expr expr = expr();
 		if ( lexer.token != Token.COMMA ) {
 			this.error("',' expected after the expression of the 'assert' statement");
 		}

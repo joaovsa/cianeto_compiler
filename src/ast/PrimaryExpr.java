@@ -9,7 +9,7 @@ import java.util.Iterator;
 public class PrimaryExpr extends Factor {
 
 	public PrimaryExpr(boolean self, boolean sup, String id1, boolean funcId1,
-			String id2,  boolean funcId2, String idColon, ArrayList<Expression> exprList) {
+			String id2,  boolean funcId2, String idColon, ArrayList<Expr> exprList) {
 		this.self = self;
 		this.sup = sup;
 		this.id1 = id1;
@@ -51,7 +51,7 @@ public class PrimaryExpr extends Factor {
 			}
 			if( idColon != null ) {
 				pw.print("." + idColon + "(");
-				Iterator<Expression> it = exprList.listIterator();
+				Iterator<Expr> it = exprList.listIterator();
 				it.next().genJava(pw);
 				while(it.hasNext()){
 					pw.print(", ");
@@ -67,7 +67,7 @@ public class PrimaryExpr extends Factor {
 					pw.print("()");
 			} else if( idColon != null ) {
 				pw.print("." + idColon + "(");
-				Iterator<Expression> it = exprList.listIterator();
+				Iterator<Expr> it = exprList.listIterator();
 				it.next().genJava(pw);
 				while(it.hasNext()){
 					pw.print(", ");
@@ -85,7 +85,7 @@ public class PrimaryExpr extends Factor {
 					pw.print("()");
 			} else if( idColon != null ) {
 				pw.print("." + idColon + "(");
-				Iterator<Expression> it = exprList.listIterator();
+				Iterator<Expr> it = exprList.listIterator();
 				it.next().genJava(pw);
 				while(it.hasNext()){
 					pw.print(", ");
@@ -103,5 +103,5 @@ public class PrimaryExpr extends Factor {
 	private String id2;
 	private boolean funcId2;
 	private String idColon;
-	private ArrayList<Expression> exprList;
+	private ArrayList<Expr> exprList;
 }

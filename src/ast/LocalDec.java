@@ -8,7 +8,7 @@ import java.util.Iterator;
 
 public class LocalDec extends Statement {
 
-	public LocalDec(String type, ArrayList<String> idList, Expression expr) {
+	public LocalDec(String type, ArrayList<String> idList, Expr expr) {
 		this.type = type;
 		this.idList = idList;
 		this.expr = expr;
@@ -40,5 +40,5 @@ public class LocalDec extends Statement {
 
 	private String type;
 	private ArrayList<String> idList;
-	private Expression expr;
+	private Expr expr;
 }
