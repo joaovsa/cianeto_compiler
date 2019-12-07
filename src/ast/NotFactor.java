@@ -5,7 +5,7 @@ package ast;
 
 public class NotFactor extends Factor {
 
-	public NotFactor(Factor factor) {
+	public NotFactor(Expr factor) {
 		this.factor = factor;
 	}
 	
@@ -28,5 +28,5 @@ public class NotFactor extends Factor {
 		pw.print(") ");
 	}
 
-	private Factor factor;
+	private Expr factor;
 }

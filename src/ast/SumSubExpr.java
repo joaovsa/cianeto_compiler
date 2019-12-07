@@ -8,7 +8,7 @@ import java.util.Iterator;
 
 public class SumSubExpr extends Expr {
 
-	public SumSubExpr(ArrayList<Term> term, ArrayList<String> operator) {
+	public SumSubExpr(ArrayList<Expr> term, ArrayList<String> operator) {
 		this.term = term;
 		this.operator = operator;
 	}
@@ -25,7 +25,7 @@ public class SumSubExpr extends Expr {
 	@Override
 	public void genJava(PW pw) {
 
-		Iterator<Term> it = term.listIterator();
+		Iterator<Expr> it = term.listIterator();
 		Iterator<String> op = operator.listIterator();
 		
 		it.next().genJava(pw);
@@ -37,6 +37,6 @@ public class SumSubExpr extends Expr {
 	
 	}
 
-	private ArrayList<Term> term;
+	private ArrayList<Expr> term;
 	private ArrayList<String> operator;
 }

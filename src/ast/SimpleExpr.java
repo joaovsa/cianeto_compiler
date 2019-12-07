@@ -8,7 +8,7 @@ import java.util.Iterator;
 
 public class SimpleExpr extends Expr {
 
-	public SimpleExpr(ArrayList<SumSubExpr> sse) {
+	public SimpleExpr(ArrayList<Expr> sse) {
 		this.sse = sse;
 	}
 	
@@ -24,7 +24,7 @@ public class SimpleExpr extends Expr {
 	@Override
 	public void genJava(PW pw) {
 
-		Iterator<SumSubExpr> it = sse.listIterator();
+		Iterator<Expr> it = sse.listIterator();
 		
 		it.next().genJava(pw);
 		while(it.hasNext()) {
@@ -34,5 +34,5 @@ public class SimpleExpr extends Expr {
 		
 	}
 
-	private ArrayList<SumSubExpr> sse;
+	private ArrayList<Expr> sse;
 }

@@ -8,12 +8,13 @@ import java.util.Iterator;
 
 public class Term extends Expr {
 
-	public Term(ArrayList<SignalFactor> sf, ArrayList<String> operator) {
+	public Term(ArrayList<Expr> sf, ArrayList<String> operator) {
 		this.sf = sf;
 		this.operator = operator;
 	}
 	
-	public SignalFactor getFirstSf() {
+	//TODO: verify need
+	public Expr getFirstSf() {
 		return this.sf.get(0);
 	}
 	
@@ -31,7 +32,7 @@ public class Term extends Expr {
 
 	@Override
 	public void genJava(PW pw) {
-		Iterator<SignalFactor> it = sf.listIterator();
+		Iterator<Expr> it = sf.listIterator();
 		Iterator<String> op = operator.listIterator();
 
 		it.next().genJava(pw);
@@ -43,6 +44,6 @@ public class Term extends Expr {
 		
 	}
 	
-	private ArrayList<SignalFactor> sf;
+	private ArrayList<Expr> sf;
 	private ArrayList<String> operator;
 }

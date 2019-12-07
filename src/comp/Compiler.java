@@ -308,8 +308,7 @@ public class Compiler {
 	}
 
 	private Statement statement() {
-		//TODO: change to member
-		String var;
+		//TODO: change to member		
 		boolean checkSemiColon = true;
 		Statement statement = null;
 		switch ( lexer.token ) {
@@ -371,7 +370,7 @@ public class Compiler {
 		if(!type.equals(Token.INT.toString().toLowerCase()) &&
 				!type.equals(Token.BOOLEAN.toString().toLowerCase()) &&
 				!type.equals(Token.STRING.toString().toLowerCase())) {
-			//checkglobal			
+			//check global			
 			if(symbolTable.getClass(type)==null) {
 				//error
 				msg = "Type '" + type + "' was not found";
@@ -501,7 +500,7 @@ public class Compiler {
 	
 	private Expr simpleExpr() {
 
-		ArrayList<SumSubExpr> sse = new ArrayList<>();
+		ArrayList<Expr> sse = new ArrayList<>();
 		sse.add(sumSubExpr());
 		while ( lexer.token == Token.PLUSPLUS ) {
 			next();
@@ -510,23 +509,23 @@ public class Compiler {
 		return new SimpleExpr(sse);
 	}
 	
-	private SumSubExpr sumSubExpr() {
+	private Expr sumSubExpr() {
 		//Term { LowOperator Term }
 		String exprtype = "";
 		String op = "";
-		Term t;
-		SignalFactor sf;
-		ArrayList<Term> term = new ArrayList<>();
+		Expr t;
+		Expr sf;
+		ArrayList<Expr> term = new ArrayList<>();
 		ArrayList<String> operator = new ArrayList<>();
 		t = term();
 		term.add(t);
-		sf = t.getFirstSf();
+		sf = ((Term) t).getFirstSf();
 		
-		if(sf.getFactor() instanceof ast.LiteralBoolean)
+		if(((SignalFactor) sf).getFactor() instanceof ast.LiteralBoolean)
 			exprtype = Token.BOOLEAN.toString();
-		else if(sf.getFactor() instanceof ast.LiteralString)
+		else if(((SignalFactor) sf).getFactor() instanceof ast.LiteralString)
 			exprtype = Token.STRING.toString();
-		else if(sf.getFactor() instanceof ast.LiteralInt)
+		else if(((SignalFactor) sf).getFactor() instanceof ast.LiteralInt)
 			exprtype = Token.INT.toString();
 		else{
 			exprtype = Token.NULL.toString();
@@ -537,7 +536,7 @@ public class Compiler {
 		if(lexer.token == Token.PLUS || lexer.token == Token.MINUS || 
 				lexer.token == Token.DIV || lexer.token == Token.MULT || lexer.token == Token.PLUSPLUS) {
 			
-			if(sf.getFactor() instanceof ast.LiteralBoolean) {
+			if(((SignalFactor) sf).getFactor() instanceof ast.LiteralBoolean) {
 				error("type boolean does not support operation '"+lexer.token.toString()+"'");
 			}
 		}
@@ -549,14 +548,15 @@ public class Compiler {
 			next();
 			t = term();
 			term.add(t);
-			sf = t.getFirstSf();
+			sf = ((Term) t).getFirstSf();
 			
+			//TODO: update to Type
 			//semantic
-			if(sf.getFactor() instanceof ast.LiteralBoolean)
+			if(((SignalFactor) sf).getFactor() instanceof ast.LiteralBoolean)
 				exprtype = Token.BOOLEAN.toString();
-			else if(sf.getFactor() instanceof ast.LiteralString)
+			else if(((SignalFactor) sf).getFactor() instanceof ast.LiteralString)
 				exprtype = Token.STRING.toString();
-			else if(sf.getFactor() instanceof ast.LiteralInt)
+			else if(((SignalFactor) sf).getFactor() instanceof ast.LiteralInt)
 				exprtype = Token.INT.toString();
 			else{
 				exprtype = Token.NULL.toString();
@@ -565,11 +565,11 @@ public class Compiler {
 			
 			
 			
-			if(sf.getFactor() instanceof ast.LiteralBoolean &&
+			if(((SignalFactor) sf).getFactor() instanceof ast.LiteralBoolean &&
 					lexer.token == Token.PLUS || lexer.token == Token.MINUS) {
 				error("operator '"+lexer.token.toString()+"' of '"+
 						exprtype+"' expects an '"+exprtype+"' value");
-			} else if (sf.getFactor() instanceof ast.LiteralInt &&
+			} else if (((SignalFactor) sf).getFactor() instanceof ast.LiteralInt &&
 					//wrongly getting outter Relation
 					lexer.token != Token.PLUS || lexer.token != Token.MINUS ||
 					lexer.token != Token.DIV || lexer.token != Token.MULT) {
@@ -581,8 +581,8 @@ public class Compiler {
 		return new SumSubExpr(term, operator);
 	}
 
-	private Term term() {
-		ArrayList<SignalFactor> sf = new ArrayList<>();
+	private Expr term() {
+		ArrayList<Expr> sf = new ArrayList<>();
 		ArrayList<String> operator = new ArrayList<>();
 		sf.add(signalFactor());
 		while ( lexer.token == Token.MULT || lexer.token == Token.DIV || lexer.token == Token.AND ) {
@@ -593,17 +593,17 @@ public class Compiler {
 		return new Term(sf, operator);
 	}
 
-	private SignalFactor signalFactor() {
+	private Expr signalFactor() {
 		String signal = null;
 		if( lexer.token == Token.PLUS || lexer.token == Token.MINUS ) {
 			signal = lexer.token.toString();
 			next();
 		}
-		Factor factor = factor();
+		Expr factor = factor();
 		return new SignalFactor(factor, signal);
 	}
 	
-	private Factor factor() {
+	private Expr factor() {
 		switch ( lexer.token ) {
 		case LEFTPAR:
 			next();
@@ -614,7 +614,8 @@ public class Compiler {
 			return new ExprPar(expr);
 		case NOT:
 			next();
-			Factor factor = factor();
+			Expr factor = factor();
+			//TODO: check if we need factor on AST
 			return new NotFactor(factor);
 		case NULL:
 			next();

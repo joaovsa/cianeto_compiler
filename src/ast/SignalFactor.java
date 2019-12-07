@@ -5,11 +5,11 @@ package ast;
 
 public class SignalFactor extends Expr {
 
-	public SignalFactor(Factor factor, String signal) {
+	public SignalFactor(Expr factor, String signal) {
 		this.factor = factor;
 		this.signal = signal;
 	}
-	public Factor getFactor() {
+	public Expr getFactor() {
 		return this.factor;
 	}
 	@Override
@@ -31,6 +31,6 @@ public class SignalFactor extends Expr {
 		factor.genJava(pw);
 	}
 
-	private Factor factor;
+	private Expr factor;
 	private String signal;
 }
