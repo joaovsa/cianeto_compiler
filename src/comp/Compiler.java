@@ -815,7 +815,7 @@ public class Compiler {
 				sup = true;
 				primary = true;
 				next();
-				if ( lexer.token != Token.DOT )
+				if ( lexer.token != Token.DOT ) 
 					error("'.' expected");
 				next();
 				if ( lexer.token == Token.ID ) {
