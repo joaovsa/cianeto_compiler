@@ -762,10 +762,20 @@ public class Compiler {
 					}
 					else if ( lexer.token == Token.IDCOLON ) {
 						idColon = lexer.getStringValue();
-						field = (Field) symbolTable.getInFunc(id1);
-						if( field == null )
+						field = null;
+						param = null;
+						try {
+							field = ((Field) symbolTable.getInFunc(id1));
+						} catch (ClassCastException e) {
+							param = ((FormalParamDec) symbolTable.getInFunc(id1));
+						}
+						if ( field != null )
+							id1Type = field.getType();
+						else if ( param != null )
+							id1Type = param.getType();
+						if( field == null && param == null )
 							error("Identifer '" + id1 + "' was not found");
-						TypeCianetoClass classe = (TypeCianetoClass) symbolTable.getInGlobal(field.getType());
+						TypeCianetoClass classe = (TypeCianetoClass) symbolTable.getInGlobal(id1Type);
 						MethodList method = classe.getPublicMethodList(idColon); 
 						if(method == null)
 							error("Method '"+ idColon +"' was not found in class '" + classe.getName() + "' or its superclasses");
@@ -852,9 +862,17 @@ public class Compiler {
 					}
 					else if ( lexer.token == Token.ID ) {
 						id1 = lexer.getStringValue();
-						Field field = ((Field) symbolTable.getInFunc(id1));
+						Field field = null;
+						FormalParamDec param = null;
+						try {
+							field = ((Field) symbolTable.getInFunc(id1));
+						} catch (ClassCastException e) {
+							param = ((FormalParamDec) symbolTable.getInFunc(id1));
+						}
 						if ( field != null )
 							id1Type = field.getType();
+						else if ( param != null )
+							id1Type = param.getType();
 						if ( funcList.contains(id1) )
 							funcId1 = true;
 						Object member = symbolTable.getInLocal(id1);
@@ -874,7 +892,17 @@ public class Compiler {
 							}
 							else if ( lexer.token == Token.ID ) {
 								id2 = lexer.getStringValue();
-								id2Type = ((Field) symbolTable.getInFunc(id2)).getType();
+								field = null;
+								param = null;
+								try {
+									field = ((Field) symbolTable.getInFunc(id2));
+								} catch (ClassCastException e) {
+									param = ((FormalParamDec) symbolTable.getInFunc(id2));
+								}
+								if ( field != null )
+									id2Type = field.getType();
+								else if ( param != null )
+									id2Type = param.getType();
 								if ( funcList.contains(id2) )
 									funcId2 = true;
 								next();
