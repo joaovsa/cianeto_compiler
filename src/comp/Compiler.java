@@ -288,6 +288,15 @@ public class Compiler {
 			lexer.nextToken();
 			rt_type = type();
 		}
+		if ( atual.getSuperclassName() != null ) {
+			TypeCianetoClass superclass = (TypeCianetoClass) symbolTable.getInGlobal(atual.getSuperclassName());
+			if( superclass != null ) {
+				if ( superclass.getPublicMethodList(name) != null ) {
+					if ( superclass.getPublicMethodList(name).getNumberParamDec() != paramDec.size() )
+						error("Method '"+ name +"' of the subclass '" + atual.getName() + "' has a signature different from the same method of superclass '" + atual.getSuperclassName() + "'");
+				}
+			}
+		}
 		if ( lexer.token != Token.LEFTCURBRACKET ) {
 			error("'{' expected");
 		}
@@ -802,7 +811,9 @@ public class Compiler {
 						TypeCianetoClass classe = (TypeCianetoClass) symbolTable.getInGlobal(field.getType());
 						MethodList method = null;
 						if ( classe != null)
-							method = classe.getPublicMethodList(id2); 
+							method = classe.getPublicMethodList(id2);
+							if ( method == null )
+								method = classe.getPublicMethodList(id2+":");
 						if(method == null)
 							error("Method '"+ id2 +"' was not found in the public interface of '" + classe.getName() + "' or ts superclasses");
 						next();
@@ -815,7 +826,7 @@ public class Compiler {
 				sup = true;
 				primary = true;
 				next();
-				if ( lexer.token != Token.DOT ) 
+				if ( lexer.token != Token.DOT )
 					error("'.' expected");
 				next();
 				if ( lexer.token == Token.ID ) {
