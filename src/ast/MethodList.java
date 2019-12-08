@@ -63,6 +63,10 @@ public class MethodList {
 		return name;
 	}
 
+	public int getNumberParamDec() {
+		return paramDec.size();
+	}
+	
 	private boolean priv;
 	private boolean hasScanner;
 	private String name;
