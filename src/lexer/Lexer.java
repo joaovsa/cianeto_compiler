@@ -125,6 +125,10 @@ public class Lexer {
                 tokenPos++;
                 switch ( ch ) {
                     case '+' :
+                      if ( input[tokenPos] == '+' ) {
+                          tokenPos++;
+                          token = Token.PLUSPLUS;
+                      }
                       token = Token.PLUS;
                       break;
                     case '-' :
