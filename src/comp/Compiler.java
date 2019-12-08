@@ -174,7 +174,7 @@ public class Compiler {
 		String className = lexer.getStringValue();
 		lexer.nextToken();
 		c = new TypeCianetoClass(className);
-		symbolTable.putInGlobal(className.toLowerCase(), c);
+		symbolTable.putInGlobal(className, c);
 		
 		
 		if ( lexer.token == Token.EXTENDS ) {
@@ -789,9 +789,7 @@ public class Compiler {
 							error("Identifer '" + id1 + "' was not found");
 						if (field.getType().equals("int"))
 							error("Message send to a non-object receiver");
-						System.out.println(field.getType());
 						TypeCianetoClass classe = (TypeCianetoClass) symbolTable.getInGlobal(field.getType());
-						if ( classe == null ) System.out.println("testeee");
 						MethodList method = null;
 						if ( classe != null)
 							method = classe.getPublicMethodList(id2); 
