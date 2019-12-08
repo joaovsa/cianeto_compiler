@@ -58,6 +58,10 @@ public class MethodList {
 		pw.sub();
 		pw.printlnIdent("}");
 	}
+	
+	public String getName() {
+		return name;
+	}
 
 	private boolean priv;
 	private boolean hasScanner;

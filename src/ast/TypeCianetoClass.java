@@ -59,6 +59,24 @@ public class TypeCianetoClass extends Type {
 		pw.println();
 	}
 
+   public MethodList getPublicMethodList(String name){
+       int it;
+       for (it=0;it<publicMethodList.size();it++){
+           if (publicMethodList.get(it).getName().equals(name)){
+               return publicMethodList.get(it);
+           }
+       }
+       return null;
+   }
+   
+   public String getName() {
+	   return name;
+   }
+
+   public String getSuperclassName() {
+	   return superclassName;
+   }
+   
    private String name;
    private String superclassName;
    private TypeCianetoClass superclass;

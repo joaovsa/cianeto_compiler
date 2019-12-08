@@ -179,12 +179,19 @@ public class Compiler {
 			lexer.nextToken();
 		}
 
+		TypeCianetoClass cianetoClass = new TypeCianetoClass(className, fieldList, publicMethodList, privateMethodList, superclassName);
+		atual = cianetoClass;
+		
+		symbolTable.putInGlobal(className, cianetoClass);
+		
 		memberList(fieldList, publicMethodList, privateMethodList);
 		if ( lexer.token != Token.END)
 			error("'end' expected");
 		lexer.nextToken();
-
-		CianetoClassList.add(new TypeCianetoClass(className, fieldList, publicMethodList, privateMethodList, superclassName));
+		
+		symbolTable.removeLocal();
+		
+		CianetoClassList.add(cianetoClass);
 	}
 
 	private void memberList(ArrayList<FieldList> fieldList, ArrayList<MethodList> publicMethodList, 
@@ -237,11 +244,23 @@ public class Compiler {
 		if ( lexer.token == Token.ID ) {
 			// unary method
 			name = lexer.getStringValue();
+			Object member = symbolTable.getInLocal(name);
+			if ( member != null)
+				if ( member instanceof Field)
+					error("Method '" + name + "' has name equal to an instance variable");
+				else
+					error("Method '" + name + "' is being redeclared");
 			lexer.nextToken();
 		}
 		else if ( lexer.token == Token.IDCOLON ) {
 			// keyword method. It has parameters
 			name = lexer.getStringValue();
+			Object member = symbolTable.getInLocal(name);
+			if ( member != null)
+				if ( member instanceof Field)
+					error("Method '" + name + "' has name equal to an instance variable");
+				else
+					error("Method '" + name + "' is being redeclared");
 			lexer.nextToken();
 			paramDec = formalParamDec();
 		}
@@ -269,6 +288,10 @@ public class Compiler {
 	        name = name.substring(0, name.length() - 1);
 	    }
 		funcList.add(name);
+
+		symbolTable.putInLocal(name, methodDec);
+			
+		symbolTable.removeFunc();
 		return methodDec;
 	}
 
@@ -279,7 +302,9 @@ public class Compiler {
 		type = type();
 		check(Token.ID, "A variable name was expected");
 		name = lexer.getStringValue();
-		paramDec.add(new FormalParamDec(name, type));
+		FormalParamDec p = new FormalParamDec(name, type);
+		paramDec.add(p);
+		symbolTable.putInFunc(name, p);
 		next();
 		while ( lexer.token == Token.COMMA ) {
 			next();
@@ -361,9 +386,16 @@ public class Compiler {
 		next();
 		String type = type();
 		ArrayList<String> idList = new ArrayList<>();
+		String nameField;
 		check(Token.ID, "A variable name was expected");
 		while ( lexer.token == Token.ID ) {
-			idList.add(lexer.getStringValue());
+			nameField = lexer.getStringValue(); 
+			idList.add(nameField);
+			Field f = new Field(nameField, type);
+			Object member = symbolTable.getInFunc(nameField);
+			if ( member != null )
+					error("Variable '" + nameField + "' is being redeclared");
+			symbolTable.putInFunc(nameField, f);
 			next();
 			if ( lexer.token == Token.COMMA ) {
 				next();
@@ -594,6 +626,13 @@ public class Compiler {
 					}
 					else if ( lexer.token == Token.IDCOLON ) {
 						idColon = lexer.getStringValue();
+						Field field = (Field) symbolTable.getInFunc(id1);
+						if( field == null )
+							error("Identifer '" + id1 + "' was not found");
+						TypeCianetoClass classe = (TypeCianetoClass) symbolTable.getInGlobal(field.getType());
+						MethodList method = classe.getPublicMethodList(idColon); 
+						if(method == null)
+							error("Method '"+ idColon +"' was not found in class '" + classe.getName() + "' or its superclasses");
 						next();
 						exprList.add(expr());
 						while ( lexer.token == Token.COMMA ) {
@@ -603,11 +642,23 @@ public class Compiler {
 					}
 					else if ( lexer.token == Token.ID ) {
 						id2 = lexer.getStringValue();
-						if ( funcList.contains(id2) )
+						if ( funcList.contains(id2) ) {
 							funcId2 = true;
+						}
+						Field field = (Field) symbolTable.getInFunc(id1);
+						if( field == null )
+							error("Identifer '" + id1 + "' was not found");
+						if (field.getType().equals("int"))
+							error("Message send to a non-object receiver");
+						TypeCianetoClass classe = (TypeCianetoClass) symbolTable.getInGlobal(field.getType());
+						MethodList method = classe.getPublicMethodList(id2); 
+						if(method == null)
+							error("Method '"+ id2 +"' was not found in the public interface of '" + classe.getName() + "' or ts superclasses");
 						next();
 					}
 				}
+				if( symbolTable.getInFunc(id1) == null )
+					error("Identifer '" + id1 + "' was not found");
 			}
 			else if ( lexer.token == Token.SUPER ) {
 				sup = true;
@@ -618,6 +669,12 @@ public class Compiler {
 				next();
 				if ( lexer.token == Token.ID ) {
 					id1 = lexer.getStringValue();
+					
+					TypeCianetoClass superclass = (TypeCianetoClass) symbolTable.getInGlobal(atual.getSuperclassName());
+					MethodList method = superclass.getPublicMethodList(id1); 
+					if(method == null)
+						error("Method '"+ id1 +"' was not found in superclass '" + atual.getName() + "' or its superclasses");
+					
 					if ( funcList.contains(id1) )
 						funcId1 = true;
 					next();
@@ -651,6 +708,9 @@ public class Compiler {
 						id1 = lexer.getStringValue();
 						if ( funcList.contains(id1) )
 							funcId1 = true;
+						Object member = symbolTable.getInLocal(id1);
+						if( member == null )
+							error("Member '" + id1 + "' was not found");
 						next();
 						if ( lexer.token == Token.DOT ) {
 							next();
@@ -690,12 +750,19 @@ public class Compiler {
 		lexer.nextToken();
 		String type = type();
 		ArrayList<String> idList = new ArrayList<>();
+		String nameField;
 		if ( lexer.token != Token.ID ) {
 			this.error("A field name was expected");
 		}
 		else {
 			while ( lexer.token == Token.ID  ) {
-				idList.add(lexer.getStringValue());
+				nameField = lexer.getStringValue();
+				idList.add(nameField);
+				Field f = new Field(nameField, type);
+				Object member = symbolTable.getInLocal(nameField);
+				if ( member != null )
+						error("Variable '" + nameField + "' is being redeclared");
+				symbolTable.putInLocal(nameField, f);
 				lexer.nextToken();
 				if ( lexer.token == Token.COMMA ) {
 					lexer.nextToken();
@@ -809,6 +876,7 @@ public class Compiler {
 	private ArrayList<String>	funcList = new ArrayList<>();
 	private Lexer				lexer;
 	private ErrorSignaller		signalError;
+	private TypeCianetoClass	atual;
 	private boolean 			hasScanner = false;
 	private boolean 			hasScannerProg = false;
 }
