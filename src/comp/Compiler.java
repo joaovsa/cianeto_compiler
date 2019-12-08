@@ -940,7 +940,7 @@ public class Compiler {
 	}
 
 	private SymbolTable			symbolTable;
-	
+	private Type				currMethodReturn;
 	private ArrayList<String>	funcList = new ArrayList<>();
 	private Lexer				lexer;
 	private ErrorSignaller		signalError;
