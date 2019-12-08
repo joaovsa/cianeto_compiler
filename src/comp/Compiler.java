@@ -257,6 +257,7 @@ public class Compiler {
 		String rt_type = "void";
 		ArrayList<FormalParamDec> paramDec = null;
 		lexer.nextToken();
+		
 		if ( lexer.token == Token.ID ) {
 			// unary method
 			name = lexer.getStringValue();
@@ -288,6 +289,7 @@ public class Compiler {
 			lexer.nextToken();
 			rt_type = type();
 		}
+		currMethodReturn = rt_type;
 		if ( lexer.token != Token.LEFTCURBRACKET ) {
 			error("'{' expected");
 		}
@@ -478,6 +480,12 @@ public class Compiler {
 	private ReturnStat returnStat() {
 		next();
 		Expr expr = expr();
+		if(Type.getStringType(expr.getType()) != currMethodReturn)
+			if(currMethodReturn=="void")
+				error("Current Funcion does not accept return stat");
+			else
+				error("Type error: type of the expression returned is not subclass of the method return type");
+		
 		return new ReturnStat(expr);
 	}
 
@@ -1051,11 +1059,11 @@ public class Compiler {
 	}
 
 	private SymbolTable			symbolTable;
-	private Type				currMethodReturn;
+	private String				currMethodReturn;
 	private ArrayList<String>	funcList = new ArrayList<>();
 	private Lexer				lexer;
 	private ErrorSignaller		signalError;
 	private TypeCianetoClass	atual;
 	private boolean 			hasScanner = false;
-	private boolean 			hasScannerProg = false;
+	private boolean 			hasScannerProg = false;	
 }

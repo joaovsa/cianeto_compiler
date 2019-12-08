@@ -2,40 +2,44 @@ Relatório do Compilador
 
 Resumo
 _________________________________________________________________________
-MI:  2             I: 0              PI: 0             Exc: 0
-Dev: 0/1/0%        LE: 1/1/100%     
+MI:  0             I: 0              PI: 0             Exc: 0
+Dev: 0/1/0%        LE: 0/1/0%       
 
 MI = muito importante, I = importante, PI = pouco importante, Exc = exceções
 Dev = deveria ter sinalizado, LE = sinalizou linha errada, SSE = sinalizado sem erro
 _________________________________________________________________________
 
-Número de testes 'Muito importantes' em que o compilador falhou: 2
+Número de testes 'Muito importantes' em que o compilador falhou: 0
 Número de testes 'Importantes' em que o compilador falhou: 0
 Número de testes 'Pouco importantes' em que o compilador falhou: 0
 
-O compilador falhou em testar alguns aspectos (construções) de Cianeto. A lista abaixo consiste de entradas da forma 
+O compilador obteve sucesso em testar alguns aspectos (construções) de Cianeto. A lista abaixo consiste de entradas da forma 
     aspecto
         listas de nomes de arquivos
-Os nomes de arquivos listados são aqueles que testam 'aspecto' mas em que o compilador falhou em apontar um erro, apontou um erro inexistente ou gerou código errado (se opção -genjava ou -genc foi usada).
+Os nomes de arquivos listados são aqueles que testam 'aspecto' e nos quais o compilador obteve sucesso e gerou código correto (se opção -genjava ou -genc foi usada).
 Os testes são categorizados por importância: 'Muito importante', 'Importante', 'pouco importante'
 
-Testes 'Muito importantes' em que o compilador falhou:
+Testes 'Muito importantes' em que o compilador acertou:
     typeErrorAssignRightSideNotSubtypeLeftSide
         /home/joaovsa/Documentos/Lab
         Comp/student-made-tests/sem/ER_SEM39.ci
 
 
-
 _________________________________________________________________________
 
 0 de um total de 1 erros que deveriam ser sinalizados não o foram (0%)
-1 erros foram sinalizados na linha errada (100%)
+0 erros foram sinalizados na linha errada (0%)
 _________________________________________________________________________
 Todos os erros que deveriam ter sido sinalizados o foram
+Um ou mais arquivos de teste tinham erros, mas estes foram sinalizados nos números de linhas corretos
 ######################################################
-Erros que foram sinalizados na linha errada:
+Em todos os testes abaixo, o compilador sinalizou o erro na linha correta (quando o teste tinha erros) ou não sinalizou o erro (quando o teste NÃO tinha erros). Mas é necessário conferir se as mensagens emitidas pelo compilador são compatíveis com as mensagens de erro sugeridas pelas chamadas aos metaobjetos dos testes. 
+
+A lista abaixo contém o nome do arquivo de teste, a mensagem que ele sinalizou e a mensagem sugerida pelo arquivo de teste
 
 /home/joaovsa/Documentos/Lab Comp/student-made-tests/sem/ER_SEM39.ci
-    correto:    24, Type error: type of the expression returned is not subclass of the method return type (comp.Compiler.returnStatement())
-    sinalizado: 17, Can't find extended class
+The compiler message was: "Type error: type of the expression returned is not subclass of the method return type"
+The 'cep' message is:      "Type error: type of the expression returned is not subclass of the method return type"
 
+
+Para o caso de teste que você utilizou, o compilador está correto
