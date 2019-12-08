@@ -158,6 +158,8 @@ public class Compiler {
 		ArrayList<FieldList> fieldList = new ArrayList<>();;
 		ArrayList<MethodList> publicMethodList = new ArrayList<>(), privateMethodList = new ArrayList<>();;
 		String superclassName = null;
+		TypeCianetoClass c;
+		TypeCianetoClass tempclass = null;
 		
 		if ( lexer.token == Token.ID && lexer.getStringValue().equals("open") ) {
 			// open class
@@ -165,25 +167,40 @@ public class Compiler {
 		}
 		if ( lexer.token != Token.CLASS ) error("'class' expected");
 		lexer.nextToken();
+		
 		if ( lexer.token != Token.ID )
 			error("Identifier expected");
+		
 		String className = lexer.getStringValue();
 		lexer.nextToken();
+		c = new TypeCianetoClass(className);
+		symbolTable.putClass(className.toLowerCase(), c);
+		
+		
 		if ( lexer.token == Token.EXTENDS ) {
 			lexer.nextToken();
 			if ( lexer.token != Token.ID )
 				error("Identifier expected");
 			superclassName = lexer.getStringValue();
-
-			lexer.nextToken();
+			tempclass = symbolTable.getClass(superclassName);
+			//semantic
+			if(tempclass == null)
+				error("Can't find extended class");
+			
+			lexer.nextToken();			
+			c.setSuperClass(tempclass, superclassName);
 		}
-
+		
 		memberList(fieldList, publicMethodList, privateMethodList);
+		c.setFieldList(fieldList);
+		c.setprivateMethodList(privateMethodList);
+		c.setpublicMethodList(publicMethodList);
+		
 		if ( lexer.token != Token.END)
 			error("'end' expected");
 		lexer.nextToken();
 
-		CianetoClassList.add(new TypeCianetoClass(className, fieldList, publicMethodList, privateMethodList, superclassName));
+		CianetoClassList.add(c);
 	}
 
 	private void memberList(ArrayList<FieldList> fieldList, ArrayList<MethodList> publicMethodList, 

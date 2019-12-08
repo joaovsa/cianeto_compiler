@@ -11,14 +11,13 @@ import java.util.Iterator;
  */
 public class TypeCianetoClass extends Type {
 
-   public TypeCianetoClass( String name, ArrayList<FieldList> fieldList, ArrayList<MethodList> publicMethodList,
-		   ArrayList<MethodList> privateMethodList, String superclassName ) {
+   public TypeCianetoClass( String name) {
       super(name);
 	  this.name = name;
-	  this.fieldList = fieldList;
-	  this.publicMethodList = publicMethodList;
-	  this.privateMethodList = privateMethodList;
-	  this.superclassName = superclassName;
+	  this.fieldList = null;
+	  this.publicMethodList = null;
+	  this.privateMethodList = null;	  
+	  this.superclass = null;
    }
 
    @Override
@@ -26,6 +25,22 @@ public class TypeCianetoClass extends Type {
       return getName();
    }
    
+   public void setFieldList(ArrayList<FieldList> fieldList) {
+	      this.fieldList = fieldList;
+   }
+   
+   public void setpublicMethodList(ArrayList<MethodList> publicMethodList) {
+	      this.publicMethodList = publicMethodList;
+   }
+   
+   public void setprivateMethodList(ArrayList<MethodList> privateMethodList) {
+	      this.privateMethodList = privateMethodList;
+   }
+   
+   public void setSuperClass(TypeCianetoClass superClass, String superclassName) {
+      this.superclass = superClass;
+      this.superclassName = superclassName;
+   }
    public void genJava(PW pw) {
 	   	//pw.printIdent("private class " + name);
 	   	pw.printIdent("class " + name);

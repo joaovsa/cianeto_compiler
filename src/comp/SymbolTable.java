@@ -3,14 +3,16 @@
 
 package comp;
 import ast.Type;
+import ast.TypeCianetoClass;
+
 import java.util.HashMap;
 
 public class SymbolTable {
 	public HashMap<String, String> localTable;
-	public HashMap<String, String> classTable;
+	public HashMap<String, TypeCianetoClass> classTable;
 	
 	public SymbolTable(){
-		classTable = new HashMap<String, String>();
+		classTable = new HashMap<String, TypeCianetoClass>();
 		localTable = new HashMap<String, String>();
 	}
 	
@@ -33,15 +35,14 @@ public class SymbolTable {
 			
 	}
 	
-	public void putClass(String s,String t) {
-		this.classTable.put(s, t);
+	public void putClass(String s,TypeCianetoClass ciaclass) {
+		this.classTable.put(s, ciaclass);
 	}
 	
-	public String getClass(String s) {	
-		if(this.classTable.get(s)==null)
-			return null;
+	public TypeCianetoClass getClass(String s) {		
 		return this.classTable.get(s);
 	}
+	
 	public boolean clearClass() {
 		try {
 			this.classTable.clear();
