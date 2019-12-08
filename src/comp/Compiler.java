@@ -314,6 +314,10 @@ public class Compiler {
 						else if ( !(method.paramDecIsEqual(paramDec)) )
 							error("Method '" + name + "' is being redefined in subclass '" + atual.getName() + "' with a signature different from the method of superclass '" + atual.getSuperclassName() + "'");
 					}
+					if ( override == true )
+						override = false;
+					else
+						error("'override' expected before overridden method");
 				}
 			}
 		}
@@ -1026,6 +1030,7 @@ public class Compiler {
 			next();
 		}
 		else if ( lexer.token == Token.OVERRIDE ) {
+			override = true;
 			next();
 			if ( lexer.token == Token.PUBLIC ) {
 				next();
@@ -1037,6 +1042,7 @@ public class Compiler {
 				next();
 			}
 			else if ( lexer.token == Token.OVERRIDE ) {
+				override = true;
 				next();
 				if ( lexer.token == Token.PUBLIC ) {
 					next();
@@ -1096,6 +1102,7 @@ public class Compiler {
 	private Lexer				lexer;
 	private ErrorSignaller		signalError;
 	private TypeCianetoClass	atual;
+	private boolean				override = false;
 	private boolean 			hasScanner = false;
 	private boolean 			hasScannerProg = false;
 }
