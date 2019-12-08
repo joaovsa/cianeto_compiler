@@ -298,6 +298,25 @@ public class Compiler {
 			lexer.nextToken();
 			rt_type = type();
 		}
+		if ( atual.getSuperclassName() != null ) {
+			TypeCianetoClass superclass = (TypeCianetoClass) symbolTable.getInGlobal(atual.getSuperclassName());
+			if ( superclass != null ) {
+				MethodList method = superclass.getPublicMethodList(name);
+				if ( method != null ) {
+					if ( !(rt_type.equals(method.getReturnType())) )
+						error("Method '" + name + "' of subclass '" + atual.getName() + "' has a signature different from method inherited from superclass '" + atual.getSuperclassName() + "'");
+					if ( paramDec == null ) {
+						if ( method.getNumberParamDec() != 0 )
+							error("Method '" + name + "' of the subclass '" + atual.getName() + "' has a signature different from the same method of superclass '" + atual.getSuperclassName() + "'");
+					} else { 
+						if ( method.getNumberParamDec() != paramDec.size() )
+							error("Method '" + name + "' of the subclass '" + atual.getName() + "' has a signature different from the same method of superclass '" + atual.getSuperclassName() + "'");
+						else if ( !(method.paramDecIsEqual(paramDec)) )
+							error("Method '" + name + "' is being redefined in subclass '" + atual.getName() + "' with a signature different from the method of superclass '" + atual.getSuperclassName() + "'");
+					}
+				}
+			}
+		}
 		if ( lexer.token != Token.LEFTCURBRACKET ) {
 			error("'{' expected");
 		}
@@ -773,6 +792,8 @@ public class Compiler {
 					next();
 					if ( lexer.token == Token.ID && lexer.getStringValue().equals("new") ) {
 						primary = false;
+						if( symbolTable.getInGlobal(id1) == null )
+							error("Class '" + id1 + "' was not found");
 						next();
 						return new ObjectCreation(id1);
 					}
@@ -817,8 +838,11 @@ public class Compiler {
 							error("Message send to a non-object receiver");
 						TypeCianetoClass classe = (TypeCianetoClass) symbolTable.getInGlobal(field.getType());
 						MethodList method = null;
-						if ( classe != null)
+						if ( classe != null) {
 							method = classe.getPublicMethodList(id2); 
+							if(method == null)
+								method = classe.getPublicMethodList(id2+":");
+						}
 						if(method == null)
 							error("Method '"+ id2 +"' was not found in the public interface of '" + field.getType() + "' or ts superclasses");
 						next();
