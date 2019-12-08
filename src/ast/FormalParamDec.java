@@ -13,6 +13,11 @@ public class FormalParamDec {
 		pw.print(type + " " + name);
 	}
 	
+	public String getType() {
+		return type;
+	}
+	
 	private String name;
 	private String type;
+
 }

@@ -390,11 +390,12 @@ public class Compiler {
 				
 				//semantic
 				//TODO: fix for subclasses
-				if(expr1.getType() != expr2.getType()){
-					type1= Type.getStringType(expr1.getType());
-					type2= Type.getStringType(expr2.getType());
-					error("'"+type2+"' cannot be assigned to '" + type1 +"'");
-				}
+				if ( expr2 != null )
+					if(expr1.getType() != expr2.getType()){
+						type1= Type.getStringType(expr1.getType());
+						type2= Type.getStringType(expr2.getType());
+						error("'"+type2+"' cannot be assigned to '" + type1 +"'");
+					}
 					
 					
 				statement = new AssignExpr(expr1, expr2);
@@ -738,7 +739,17 @@ public class Compiler {
 			else if ( lexer.token == Token.ID ) {
 				primary = true;
 				id1 = lexer.getStringValue();
-				id1Type = ((Field) symbolTable.getInFunc(id1)).getType();
+				Field field = null;
+				FormalParamDec param = null;
+				try {
+					field = ((Field) symbolTable.getInFunc(id1));
+				} catch (ClassCastException e) {
+					param = ((FormalParamDec) symbolTable.getInFunc(id1));
+				}
+				if ( field != null )
+					id1Type = field.getType();
+				else if ( param != null )
+					id1Type = param.getType();
 				if ( funcList.contains(id1) )
 					funcId1 = true;
 				next();
@@ -751,7 +762,7 @@ public class Compiler {
 					}
 					else if ( lexer.token == Token.IDCOLON ) {
 						idColon = lexer.getStringValue();
-						Field field = (Field) symbolTable.getInFunc(id1);
+						field = (Field) symbolTable.getInFunc(id1);
 						if( field == null )
 							error("Identifer '" + id1 + "' was not found");
 						TypeCianetoClass classe = (TypeCianetoClass) symbolTable.getInGlobal(field.getType());
@@ -767,17 +778,23 @@ public class Compiler {
 					}
 					else if ( lexer.token == Token.ID ) {
 						id2 = lexer.getStringValue();
-						id2Type = ((Field) symbolTable.getInFunc(id2)).getType();
+						field = ((Field) symbolTable.getInFunc(id2));
+						if ( field != null )
+							id2Type = field.getType();
 						if ( funcList.contains(id2) ) {
 							funcId2 = true;
 						}
-						Field field = (Field) symbolTable.getInFunc(id1);
+						field = (Field) symbolTable.getInFunc(id1);
 						if( field == null )
 							error("Identifer '" + id1 + "' was not found");
 						if (field.getType().equals("int"))
 							error("Message send to a non-object receiver");
+						System.out.println(field.getType());
 						TypeCianetoClass classe = (TypeCianetoClass) symbolTable.getInGlobal(field.getType());
-						MethodList method = classe.getPublicMethodList(id2); 
+						if ( classe == null ) System.out.println("testeee");
+						MethodList method = null;
+						if ( classe != null)
+							method = classe.getPublicMethodList(id2); 
 						if(method == null)
 							error("Method '"+ id2 +"' was not found in the public interface of '" + classe.getName() + "' or ts superclasses");
 						next();
@@ -797,11 +814,15 @@ public class Compiler {
 					id1 = lexer.getStringValue();
 					
 					TypeCianetoClass superclass = (TypeCianetoClass) symbolTable.getInGlobal(atual.getSuperclassName());
-					MethodList method = superclass.getPublicMethodList(id1); 
+					MethodList method = null;
+					if ( superclass != null )
+						method = superclass.getPublicMethodList(id1); 
 					if(method == null)
 						error("Method '"+ id1 +"' was not found in superclass '" + atual.getName() + "' or its superclasses");
 					
-					id1Type = ((Field) symbolTable.getInFunc(id1)).getType();
+					Field field = ((Field) symbolTable.getInFunc(id1));
+					if ( field != null )
+						id1Type = field.getType();
 					if ( funcList.contains(id1) )
 						funcId1 = true;
 					next();
@@ -833,7 +854,9 @@ public class Compiler {
 					}
 					else if ( lexer.token == Token.ID ) {
 						id1 = lexer.getStringValue();
-						id1Type = ((Field) symbolTable.getInFunc(id1)).getType();
+						Field field = ((Field) symbolTable.getInFunc(id1));
+						if ( field != null )
+							id1Type = field.getType();
 						if ( funcList.contains(id1) )
 							funcId1 = true;
 						Object member = symbolTable.getInLocal(id1);
