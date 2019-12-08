@@ -5,7 +5,7 @@ package ast;
 
 public class AssertStat extends Statement {
 
-	public AssertStat(Expression expr, String message) {
+	public AssertStat(Expr expr, String message) {
 		this.expr = expr;
 		this.message = message;
 	}
@@ -25,6 +25,6 @@ public class AssertStat extends Statement {
 		pw.println("\";");
 	}
 
-	private Expression expr;
+	private Expr expr;
 	private String message;
 }

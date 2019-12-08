@@ -1,0 +1,128 @@
+Annot
+::= “@” Id [ “(” { AnnotParam } “)” ]
+10AnnotParam
+AssertStat
+AssignExpr
+BasicType
+BasicValue
+BooleanValue
+ClassDec
+CompStatement
+Digit
+Expression
+ExpressionList
+Factor
+FieldDec
+FormalParamDec
+HighOperator
+IdList
+IfStat
+IntValue
+LocalDec
+LowOperator
+MemberList
+Member
+MethodDec
+ObjectCreation
+ParamDec
+Program
+Qualifier
+ReadExpr
+RepeatStat
+PrimaryExpr
+::=
+::=
+::=
+::=
+::=
+::=
+::=
+::=
+::=
+::=
+::=
+::=
+IntValue | StringValue | Id
+“assert” Expression “,” StringValue
+Expression [ “=” Expression ]
+“Int” | “Boolean” | “String”
+IntValue | BooleanValue | StringValue
+“true” | “false”
+[ “open” ] “class” Id [ “extends” Id ] MemberList “end”
+“{” { Statement } “}”
+“0” | ... | “9”
+SimpleExpression [ Relation SimpleExpression ]
+Expression { “,” Expression }
+BasicValue |
+“(” Expression “)” |
+“!” Factor |
+“nil” |
+ObjectCreation |
+PrimaryExpr
+::= “var” Type IdList [ “;” ]
+::= ParamDec { “,” ParamDec }
+::= “∗” | “/” | “&&”
+::= Id { “,” Id }
+::= “if” Expression “{” Statement “}”
+[ “else” “{” Statement “}” ]
+::= Digit { Digit }
+::= “var” Type IdList [ “=” Expression ]
+::= “+” | “−” | “||”
+::= { [ Qualifier ] Member }
+::= FieldDec | MethodDec
+::= “func” IdColon FormalParamDec [ “->” Type ]
+“{” StatementList “}” |
+“func” Id [ “->” Type ] “{” StatementList “}”
+::= Id “.” “new”
+::= Type Id
+::= { Annot } ClassDec { { Annot } ClassDec }
+::= “private”
+“public”
+“override”
+“override” “public”
+“final”
+“final” “public”
+“final” “override”
+“final” “override” “public”
+“shared” “private”
+“shared” “public”
+::= “In” “.” ( “readInt” | “readString” )
+::= “repeat” StatementList “until” Expression
+::= “super” “.” IdColon ExpressionList |
+“super” “.” Id |
+Id |
+Id “.” Id |
+Id “.” IdColon ExpressionList |
+11Relation
+ReturnStat
+Signal
+SignalFactor
+SimpleExpression
+SumSubExpression
+Statement
+StatementList
+Term
+Type
+PrintStat
+WhileStat
+“self” |
+“self” “.” Id |
+“self” ”.” IdColon ExpressionList |
+“self” ”.” Id “.” IdColon ExpressionList |
+“self” ”.” Id “.” Id |
+ReadExpr
+::= “==” | “<” | “>” | “<=” | “>=” | “! =”
+::= “return” Expression
+::= “+” | “−”
+::= [ Signal ] Factor
+::= SumSubExpression { “++” SumSubExpression }
+::= Term { LowOperator Term }
+::= AssignExpr “;” | IfStat | WhileStat | ReturnStat “;” |
+PrintStat “;” | “break” “;” | “;” |
+RepeatStat “;” | LocalDec “;” |
+AssertStat “;”
+::= { Statement }
+::= SignalFactor { HighOperator SignalFactor }
+::= BasicType | Id
+::= “Out” “.” [ “print:” | “println:” ] Expression { “,” Expression }
+::= “while” Expression “{” StatementList “}”

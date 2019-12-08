@@ -1,0 +1,41 @@
+Relatório do Compilador
+
+Resumo
+_________________________________________________________________________
+MI:  2             I: 0              PI: 0             Exc: 0
+Dev: 0/1/0%        LE: 1/1/100%     
+
+MI = muito importante, I = importante, PI = pouco importante, Exc = exceções
+Dev = deveria ter sinalizado, LE = sinalizou linha errada, SSE = sinalizado sem erro
+_________________________________________________________________________
+
+Número de testes 'Muito importantes' em que o compilador falhou: 2
+Número de testes 'Importantes' em que o compilador falhou: 0
+Número de testes 'Pouco importantes' em que o compilador falhou: 0
+
+O compilador falhou em testar alguns aspectos (construções) de Cianeto. A lista abaixo consiste de entradas da forma 
+    aspecto
+        listas de nomes de arquivos
+Os nomes de arquivos listados são aqueles que testam 'aspecto' mas em que o compilador falhou em apontar um erro, apontou um erro inexistente ou gerou código errado (se opção -genjava ou -genc foi usada).
+Os testes são categorizados por importância: 'Muito importante', 'Importante', 'pouco importante'
+
+Testes 'Muito importantes' em que o compilador falhou:
+    typeErrorAssignRightSideNotSubtypeLeftSide
+        /home/joaovsa/Documentos/Lab
+        Comp/student-made-tests/sem/ER_SEM39.ci
+
+
+
+_________________________________________________________________________
+
+0 de um total de 1 erros que deveriam ser sinalizados não o foram (0%)
+1 erros foram sinalizados na linha errada (100%)
+_________________________________________________________________________
+Todos os erros que deveriam ter sido sinalizados o foram
+######################################################
+Erros que foram sinalizados na linha errada:
+
+/home/joaovsa/Documentos/Lab Comp/student-made-tests/sem/ER_SEM39.ci
+    correto:    24, Type error: type of the expression returned is not subclass of the method return type (comp.Compiler.returnStatement())
+    sinalizado: 17, Can't find extended class
+

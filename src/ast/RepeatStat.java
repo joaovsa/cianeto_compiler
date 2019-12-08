@@ -8,7 +8,7 @@ import java.util.Iterator;
 
 public class RepeatStat extends Statement {
 
-	public RepeatStat(Expression expr, ArrayList<Statement> statList) {
+	public RepeatStat(Expr expr, ArrayList<Statement> statList) {
 		this.expr = expr;
 		this.statList = statList;
 	}
@@ -39,6 +39,6 @@ public class RepeatStat extends Statement {
 		pw.println(");");
 	}
 	
-	private Expression expr;
+	private Expr expr;
 	private ArrayList<Statement> statList;
 }

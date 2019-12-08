@@ -47,4 +47,4 @@ public class SymbolTable {
 	
     private Hashtable globalTable, localTable, funcTable;
        
-}
+} 

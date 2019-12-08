@@ -3,6 +3,8 @@
 
 package ast;
 
+import com.sun.jdi.BooleanType;
+
 abstract public class Type {
 
     public Type( String name ) {
@@ -18,7 +20,20 @@ abstract public class Type {
     public String getName() {
         return name;
     }
-
+    
+    public static String getStringType(Type t) {
+    	if(t == Type.booleanType)
+    		return "boolean";
+    	else if(t == Type.intType)
+    		return "int";
+    	else if(t == Type.stringType)
+    		return "string";
+    	else if(t == Type.undefinedType)
+    		return "undefined";
+    	else if(t == Type.nullType)
+    		return "null";
+    	return "class or method";
+    }
     abstract public String getCname();
 
     private String name;

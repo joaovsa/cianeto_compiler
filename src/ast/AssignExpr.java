@@ -5,7 +5,7 @@ package ast;
 
 public class AssignExpr extends Statement {
 
-	public AssignExpr(Expression expr1, Expression expr2) {
+	public AssignExpr(Expr expr1, Expr expr2) {
 		this.expr1 = expr1;
 		this.expr2 = expr2;
 	}
@@ -29,6 +29,6 @@ public class AssignExpr extends Statement {
 		pw.println(";");
 	}
 
-	private Expression expr1;
-	private Expression expr2;
+	private Expr expr1;
+	private Expr expr2;
 }

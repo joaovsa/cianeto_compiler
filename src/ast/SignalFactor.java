@@ -5,11 +5,13 @@ package ast;
 
 public class SignalFactor extends Expr {
 
-	public SignalFactor(Factor factor, String signal) {
+	public SignalFactor(Expr factor, String signal) {
 		this.factor = factor;
 		this.signal = signal;
 	}
-	
+	public Expr getFactor() {
+		return this.factor;
+	}
 	@Override
 	public void genC(PW pw, boolean putParenthesis) {
 		// TODO Auto-generated method stub
@@ -19,7 +21,7 @@ public class SignalFactor extends Expr {
 	@Override
 	public Type getType() {
 		// TODO Auto-generated method stub
-		return null;
+		return this.factor.getType();
 	}
 
 	@Override
@@ -29,6 +31,6 @@ public class SignalFactor extends Expr {
 		factor.genJava(pw);
 	}
 
-	private Factor factor;
+	private Expr factor;
 	private String signal;
 }

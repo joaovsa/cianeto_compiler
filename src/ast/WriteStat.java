@@ -8,7 +8,7 @@ import java.util.Iterator;
 
 public class WriteStat extends Statement {
 
-	public WriteStat(boolean println, ArrayList<Expression> expr) {
+	public WriteStat(boolean println, ArrayList<Expr> expr) {
 		this.println = println;
 		this.expr = expr;
 	}
@@ -26,7 +26,7 @@ public class WriteStat extends Statement {
 			pw.print("ln");
 		pw.print("(");
 		
-		Iterator<Expression> it = expr.listIterator();
+		Iterator<Expr> it = expr.listIterator();
 		it.next().genJava(pw);
 		while(it.hasNext()){
 			pw.print(" + ");
@@ -37,5 +37,5 @@ public class WriteStat extends Statement {
 	}
 
 	private boolean println;
-	private ArrayList<Expression> expr;
+	private ArrayList<Expr> expr;
 }

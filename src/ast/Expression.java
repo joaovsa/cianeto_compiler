@@ -5,7 +5,7 @@ package ast;
 
 public class Expression extends Expr {
 
-	public Expression(SimpleExpr se1, String relation, SimpleExpr se2) {
+	public Expression(Expr se1, String relation, Expr se2) {
 		this.se1 = se1;
 		this.se2 = se2;
 		this.relation = relation;
@@ -16,8 +16,8 @@ public class Expression extends Expr {
 	}
 
 	@Override
-	public Type getType() {
-		return null;
+	public Type getType() {				
+		return this.se1.getType();
 	}
 
 	@Override
@@ -29,7 +29,7 @@ public class Expression extends Expr {
 		}
 	}
 
-	private SimpleExpr se1;
-	private SimpleExpr se2;
+	private Expr se1;
+	private Expr se2;
 	private String relation;
 }

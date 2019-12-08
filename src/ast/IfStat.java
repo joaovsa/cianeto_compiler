@@ -8,7 +8,7 @@ import java.util.Iterator;
 
 public class IfStat extends Statement {
 	
-	public IfStat(Expression cond, ArrayList<Statement> stat, ArrayList<Statement> elsePart) {
+	public IfStat(Expr cond, ArrayList<Statement> stat, ArrayList<Statement> elsePart) {
 		this.cond = cond;
 		this.stat = stat;
 		this.elsePart = elsePart;
@@ -50,7 +50,7 @@ public class IfStat extends Statement {
 		}
 	}
 	
-	private Expression cond;
+	private Expr cond;
 	private ArrayList<Statement> stat;
 	private ArrayList<Statement> elsePart;
 }
