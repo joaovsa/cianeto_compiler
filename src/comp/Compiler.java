@@ -174,7 +174,7 @@ public class Compiler {
 		String className = lexer.getStringValue();
 		lexer.nextToken();
 		c = new TypeCianetoClass(className);
-		symbolTable.putClass(className.toLowerCase(), c);
+		symbolTable.putInGlobal(className.toLowerCase(), c);
 		
 		
 		if ( lexer.token == Token.EXTENDS ) {
@@ -182,7 +182,7 @@ public class Compiler {
 			if ( lexer.token != Token.ID )
 				error("Identifier expected");
 			superclassName = lexer.getStringValue();
-			tempclass = symbolTable.getClass(superclassName);
+			tempclass = (TypeCianetoClass) symbolTable.getInGlobal(superclassName);
 			//semantic
 			if(tempclass == null)
 				error("Can't find extended class");
@@ -191,7 +191,7 @@ public class Compiler {
 			c.setSuperClass(tempclass, superclassName);
 		}
 		
-		atual = cianetoClass;
+		atual = c;
 		
 		memberList(fieldList, publicMethodList, privateMethodList);
 		c.setFieldList(fieldList);
@@ -420,7 +420,7 @@ public class Compiler {
 				!type.equals(Token.BOOLEAN.toString().toLowerCase()) &&
 				!type.equals(Token.STRING.toString().toLowerCase())) {
 			//check global			
-			if(symbolTable.getClass(type)==null) {
+			if(symbolTable.getInGlobal(type)==null) {
 				//error
 				msg = "Type '" + type + "' was not found";
 				error(msg);
@@ -738,7 +738,7 @@ public class Compiler {
 			else if ( lexer.token == Token.ID ) {
 				primary = true;
 				id1 = lexer.getStringValue();
-				id1Type = symbolTable.getLocal(id1);
+				id1Type = ((Field) symbolTable.getInFunc(id1)).getType();
 				if ( funcList.contains(id1) )
 					funcId1 = true;
 				next();
@@ -767,7 +767,7 @@ public class Compiler {
 					}
 					else if ( lexer.token == Token.ID ) {
 						id2 = lexer.getStringValue();
-						id2Type = symbolTable.getInFunc(id2);
+						id2Type = ((Field) symbolTable.getInFunc(id2)).getType();
 						if ( funcList.contains(id2) ) {
 							funcId2 = true;
 						}
@@ -801,7 +801,7 @@ public class Compiler {
 					if(method == null)
 						error("Method '"+ id1 +"' was not found in superclass '" + atual.getName() + "' or its superclasses");
 					
-					id1Type = symbolTable.getInFunc(id1);
+					id1Type = ((Field) symbolTable.getInFunc(id1)).getType();
 					if ( funcList.contains(id1) )
 						funcId1 = true;
 					next();
@@ -833,7 +833,7 @@ public class Compiler {
 					}
 					else if ( lexer.token == Token.ID ) {
 						id1 = lexer.getStringValue();
-						id1Type = symbolTable.getLocal(id1);
+						id1Type = ((Field) symbolTable.getInFunc(id1)).getType();
 						if ( funcList.contains(id1) )
 							funcId1 = true;
 						Object member = symbolTable.getInLocal(id1);
@@ -853,7 +853,7 @@ public class Compiler {
 							}
 							else if ( lexer.token == Token.ID ) {
 								id2 = lexer.getStringValue();
-								id2Type = symbolTable.getLocal(id1);
+								id2Type = ((Field) symbolTable.getInFunc(id2)).getType();
 								if ( funcList.contains(id2) )
 									funcId2 = true;
 								next();
