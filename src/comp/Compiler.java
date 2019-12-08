@@ -257,7 +257,6 @@ public class Compiler {
 		String rt_type = "void";
 		ArrayList<FormalParamDec> paramDec = null;
 		lexer.nextToken();
-		
 		if ( lexer.token == Token.ID ) {
 			// unary method
 			name = lexer.getStringValue();
@@ -265,8 +264,13 @@ public class Compiler {
 			if ( member != null)
 				if ( member instanceof Field)
 					error("Method '" + name + "' has name equal to an instance variable");
-				else
-					error("Method '" + name + "' is being redeclared");
+				else {
+					MethodList method = (MethodList) member;
+					if ( priv == method.getPriv() )
+						error("Method '" + name + "' is being redeclared");
+					else 
+						error("Method '" + name + "' is being redefined or redeclared");
+				}
 			lexer.nextToken();
 		}
 		else if ( lexer.token == Token.IDCOLON ) {
@@ -276,8 +280,13 @@ public class Compiler {
 			if ( member != null)
 				if ( member instanceof Field)
 					error("Method '" + name + "' has name equal to an instance variable");
-				else
-					error("Method '" + name + "' is being redeclared");
+				else {
+					MethodList method = (MethodList) member;
+					if ( priv == method.getPriv() )
+						error("Method '" + name + "' is being redeclared");
+					else 
+						error("Method '" + name + "' is being redefined");
+				}
 			lexer.nextToken();
 			paramDec = formalParamDec();
 		}
@@ -288,16 +297,6 @@ public class Compiler {
 			// method declared a return type
 			lexer.nextToken();
 			rt_type = type();
-		}
-		currMethodReturn = rt_type;
-		if ( atual.getSuperclassName() != null ) {
-			TypeCianetoClass superclass = (TypeCianetoClass) symbolTable.getInGlobal(atual.getSuperclassName());
-			if( superclass != null ) {
-				if ( superclass.getPublicMethodList(name) != null ) {
-					if ( superclass.getPublicMethodList(name).getNumberParamDec() != paramDec.size() )
-						error("Method '"+ name +"' of the subclass '" + atual.getName() + "' has a signature different from the same method of superclass '" + atual.getSuperclassName() + "'");
-				}
-			}
 		}
 		if ( lexer.token != Token.LEFTCURBRACKET ) {
 			error("'{' expected");
@@ -819,11 +818,9 @@ public class Compiler {
 						TypeCianetoClass classe = (TypeCianetoClass) symbolTable.getInGlobal(field.getType());
 						MethodList method = null;
 						if ( classe != null)
-							method = classe.getPublicMethodList(id2);
-							if ( method == null )
-								method = classe.getPublicMethodList(id2+":");
+							method = classe.getPublicMethodList(id2); 
 						if(method == null)
-							error("Method '"+ id2 +"' was not found in the public interface of '" + classe.getName() + "' or ts superclasses");
+							error("Method '"+ id2 +"' was not found in the public interface of '" + field.getType() + "' or ts superclasses");
 						next();
 					}
 				}
@@ -1078,3 +1075,5 @@ public class Compiler {
 	private boolean 			hasScanner = false;
 	private boolean 			hasScannerProg = false;
 }
+
+

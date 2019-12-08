@@ -63,8 +63,32 @@ public class MethodList {
 		return name;
 	}
 
+	public String getReturnType() {
+		return returnType;
+	}
+
+	public boolean getPriv() {
+		return priv;
+	}
+	
 	public int getNumberParamDec() {
+		if(paramDec == null)
+			return 0;
 		return paramDec.size();
+	}
+	
+	public boolean paramDecIsEqual(ArrayList<FormalParamDec> paramDec2) {
+		if ( paramDec2 == null ) {
+			if ( paramDec == null ) {
+				return true; }
+			else return false; }
+		int it;
+		for (it=0;it<paramDec.size();it++){
+	        if (!(paramDec.get(it).getType().equals(paramDec2.get(it).getType()))){
+	        	return false;
+	        }
+	    }
+		return true;
 	}
 	
 	private boolean priv;
