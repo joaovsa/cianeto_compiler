@@ -427,16 +427,19 @@ public class Compiler {
 			if ( lexer.token == Token.ID && lexer.getStringValue().equals("Out") ) {
 				statement = writeStat();
 			} else {
+				boolean input = false;
 				Expr expr1 = expr();
 				Expr expr2 = null;
 				if( lexer.token == Token.ASSIGN ) {
 					next();
+					if (lexer.getStringValue().equals("In"))
+						input = true;
 					expr2 = expr();
 				}
 				
 				//semantic
 				//TODO: fix for subclasses
-				if ( expr2 != null )
+				if ( expr2 != null && !input)
 					if(expr1.getType() != expr2.getType()){
 						type1= Type.getStringType(expr1.getType());
 						type2= Type.getStringType(expr2.getType());
@@ -529,7 +532,7 @@ public class Compiler {
 	private ReturnStat returnStat() {
 		next();
 		Expr expr = expr();
-		System.out.println(Type.getStringType(expr.getType()));
+		
 		if(!Type.getStringType(expr.getType()).equals(currMethodReturn))
 			if(currMethodReturn.equals("void"))
 				error("Current Funcion does not accept return stat");
