@@ -57,6 +57,8 @@ public class Compiler {
 	        }
 
 		}
+		if ( symbolTable.getInGlobal("Program") == null )
+			this.signalError.showError("Source code without a class 'Program'", true);
 		if ( !thereWasAnError && lexer.token != Token.EOF ) {
 			try {
 				error("End of file expected");
@@ -182,6 +184,8 @@ public class Compiler {
 			if ( lexer.token != Token.ID )
 				error("Identifier expected");
 			superclassName = lexer.getStringValue();
+			if ( className.equals(superclassName) )
+				error("Class '" + className + "' is inheriting from itself");
 			tempclass = (TypeCianetoClass) symbolTable.getInGlobal(superclassName);
 			//semantic
 			if(tempclass == null)
@@ -201,6 +205,9 @@ public class Compiler {
 		if ( lexer.token != Token.END)
 			error("'end' expected");
 		lexer.nextToken();
+		
+		if ( atual.getName().equals("Program") && symbolTable.getInLocal("run") == null )
+			this.signalError.showError("Method 'run' was not found in class 'Program'", true);
 		
 		symbolTable.removeLocal();
 		CianetoClassList.add(c);
@@ -321,6 +328,10 @@ public class Compiler {
 				}
 			}
 		}
+		if ( atual.getName().equals("Program") && name.equals("run") && priv == true )
+			error("Method 'run' of class 'Program' cannot be private");
+		if ( atual.getName().equals("Program") && name.equals("run:") && paramDec != null )
+			error("Method 'run:' of class 'Program' cannot take parameters");
 		if ( lexer.token != Token.LEFTCURBRACKET ) {
 			error("'{' expected");
 		}
@@ -492,6 +503,7 @@ public class Compiler {
 	}
 
 	private RepeatStat repeatStat() {
+		whileBreak++;
 		next();
 		ArrayList<Statement> statList = new ArrayList<>();
 		while ( lexer.token != Token.UNTIL && lexer.token != Token.RIGHTCURBRACKET && lexer.token != Token.END ) {
@@ -505,7 +517,10 @@ public class Compiler {
 
 	private void breakStat() {
 		next();
-
+		if ( whileBreak > 0 )
+			whileBreak--;
+		else
+			error("'break' statement found outside a 'while' or 'repeat-until' statement");
 	}
 
 	private ReturnStat returnStat() {
@@ -521,6 +536,7 @@ public class Compiler {
 	}
 
 	private WhileStat whileStat() {
+		whileBreak++;
 		next();
 		Expr expr = expr();
 		ArrayList<Statement> statList = new ArrayList<>();
@@ -864,13 +880,14 @@ public class Compiler {
 				next();
 				if ( lexer.token == Token.ID ) {
 					id1 = lexer.getStringValue();
-					
-					TypeCianetoClass superclass = (TypeCianetoClass) symbolTable.getInGlobal(atual.getSuperclassName());
+					TypeCianetoClass superclass = null;
+					if ( atual.getSuperclassName() != null )
+						superclass = (TypeCianetoClass) symbolTable.getInGlobal(atual.getSuperclassName());
 					MethodList method = null;
 					if ( superclass != null )
 						method = superclass.getPublicMethodList(id1); 
 					if(method == null)
-						error("Method '"+ id1 +"' was not found in superclass '" + atual.getName() + "' or its superclasses");
+						error("Method '"+ id1 +"' was not found in superclass '" + atual.getName() + "' or its possible superclasses");
 					
 					Field field = ((Field) symbolTable.getInFunc(id1));
 					if ( field != null )
@@ -1103,6 +1120,7 @@ public class Compiler {
 	private ErrorSignaller		signalError;
 	private TypeCianetoClass	atual;
 	private boolean				override = false;
+	private int					whileBreak = 0;
 	private boolean 			hasScanner = false;
 	private boolean 			hasScannerProg = false;
 }
