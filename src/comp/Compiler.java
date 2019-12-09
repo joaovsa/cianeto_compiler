@@ -607,6 +607,7 @@ public class Compiler {
 			basictype = Type.getStringType(e.getType());
 				
 			//System.out.println(basictype);
+			//if ( !(basictype.equals("int")) )
 			error("Attempt to print a "+basictype+ " expression");
 		}
 		expr.add(e);
@@ -847,8 +848,21 @@ public class Compiler {
 							classe = (TypeCianetoClass) symbolTable.getInGlobal(id1Type);
 						if ( classe != null )
 							method = classe.getPublicMethodList(idColon); 
-						if(method == null)
-							error("Method '"+ idColon +"' was not found in class '" + classe.getName() + "' or its superclasses");
+						if(method == null) {
+							boolean error = true;
+							TypeCianetoClass superclass = null;
+							while ( error == true && classe != null && classe.getSuperclassName() != null ) {
+								superclass = (TypeCianetoClass) symbolTable.getInGlobal(classe.getSuperclassName());
+								if ( superclass != null ) {
+									method = superclass.getPublicMethodList(idColon);
+									if ( method != null )
+										error = false;
+								}
+								classe = superclass;
+							}
+							if (error == true)
+								error("Method '"+ idColon +"' was not found in class '" + classe.getName() + "' or its superclasses");
+						}
 						next();
 						exprList.add(expr());
 						while ( lexer.token == Token.COMMA ) {
@@ -883,8 +897,23 @@ public class Compiler {
 								if(method == null)
 									method = classe.getPublicMethodList(id2+":");
 							}
-							if(method == null)
-								error("Method '"+ id2 +"' was not found in the public interface of '" + field.getType() + "' or ts superclasses");
+							if(method == null) {
+								boolean error = true;
+								TypeCianetoClass superclass = null;
+								while ( error == true && classe != null && classe.getSuperclassName() != null ) {
+									superclass = (TypeCianetoClass) symbolTable.getInGlobal(classe.getSuperclassName());
+									if ( superclass != null ) {
+										method = superclass.getPublicMethodList(id2);
+										if(method == null)
+											method = classe.getPublicMethodList(id2+":");
+										if ( method != null )
+											error = false;
+									}
+									classe = superclass;
+								}
+								if (error == true)
+									error("Method '"+ id2 +"' was not found in class '" + classe.getName() + "' or its superclasses");
+							}
 						} catch (NullPointerException e) {
 							//idk
 						}
