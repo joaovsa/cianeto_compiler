@@ -440,7 +440,7 @@ public class Compiler {
 				//semantic
 				//TODO: fix for subclasses
 				if ( expr2 != null && !input)
-					if(expr1.getType() != expr2.getType()){
+					if(expr1.getType() != expr2.getType() && !Type.getStringType(expr2.getType()).equals("null")){
 						type1= Type.getStringType(expr1.getType());
 						type2= Type.getStringType(expr2.getType());
 						error("'"+type2+"' cannot be assigned to '" + type1 +"'");
@@ -852,26 +852,36 @@ public class Compiler {
 					}
 					else if ( lexer.token == Token.ID ) {
 						id2 = lexer.getStringValue();
+						
 						field = ((Field) symbolTable.getInFunc(id2));
 						if ( field != null )
 							id2Type = field.getType();
 						if ( funcList.contains(id2) ) {
 							funcId2 = true;
 						}
-						field = (Field) symbolTable.getInFunc(id1);
+						try {
+							field = (Field) symbolTable.getInFunc(id1);
+						} catch(ClassCastException e) {
+							//treat paramdec
+						}
 						if( field == null )
 							error("Identifer '" + id1 + "' was not found");
-						if (field.getType().equals("int"))
-							error("Message send to a non-object receiver");
-						TypeCianetoClass classe = (TypeCianetoClass) symbolTable.getInGlobal(field.getType());
-						MethodList method = null;
-						if ( classe != null) {
-							method = classe.getPublicMethodList(id2); 
+						try {
+							if (field.getType().equals("int"))
+								error("Message send to a non-object receiver");
+						
+							TypeCianetoClass classe = (TypeCianetoClass) symbolTable.getInGlobal(field.getType());
+							MethodList method = null;
+							if ( classe != null) {
+								method = classe.getPublicMethodList(id2); 
+								if(method == null)
+									method = classe.getPublicMethodList(id2+":");
+							}
 							if(method == null)
-								method = classe.getPublicMethodList(id2+":");
+								error("Method '"+ id2 +"' was not found in the public interface of '" + field.getType() + "' or ts superclasses");
+						} catch (NullPointerException e) {
+							//idk
 						}
-						if(method == null)
-							error("Method '"+ id2 +"' was not found in the public interface of '" + field.getType() + "' or ts superclasses");
 						next();
 					}
 				}

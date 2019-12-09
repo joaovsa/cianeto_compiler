@@ -77,11 +77,16 @@ public class TypeCianetoClass extends Type {
 
    public MethodList getPublicMethodList(String name){
        int it;
-       for (it=0;it<publicMethodList.size();it++){
-           if (publicMethodList.get(it).getName().equals(name)){
-               return publicMethodList.get(it);
-           }
+       try {
+	       for (it=0;it<publicMethodList.size();it++){
+	           if (publicMethodList.get(it).getName().equals(name)){
+	               return publicMethodList.get(it);
+	           }
+	       }
+       }catch (NullPointerException e) {
+    	   //shame
        }
+       
        return null;
    }
    
