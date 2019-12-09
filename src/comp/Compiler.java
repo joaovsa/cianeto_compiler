@@ -1,7 +1,7 @@
 /* 	Joao Vitor de Sa Medeiros Santos	552585 *
  *	Vinicius Silva Salinas				726594 */
 
-package comp;
+package comp; 
 
 import java.io.PrintWriter;
 import java.util.ArrayList;
@@ -373,8 +373,10 @@ public class Compiler {
 			type = type();
 			check(Token.ID, "A variable name was expected");
 			name = lexer.getStringValue();
-			paramDec.add(new FormalParamDec(name, type));
-			next();
+			p = new FormalParamDec(name, type);
+			paramDec.add(p);
+			symbolTable.putInFunc(name, p);
+			next(); 
 		}
 		return paramDec;
 	}
@@ -839,8 +841,12 @@ public class Compiler {
 							id1Type = param.getType();
 						if( field == null && param == null )
 							error("Identifer '" + id1 + "' was not found");
-						TypeCianetoClass classe = (TypeCianetoClass) symbolTable.getInGlobal(id1Type);
-						MethodList method = classe.getPublicMethodList(idColon); 
+						TypeCianetoClass classe = null;
+						MethodList method = null;
+						if ( symbolTable.getInGlobal(id1Type) != null )
+							classe = (TypeCianetoClass) symbolTable.getInGlobal(id1Type);
+						if ( classe != null )
+							method = classe.getPublicMethodList(idColon); 
 						if(method == null)
 							error("Method '"+ idColon +"' was not found in class '" + classe.getName() + "' or its superclasses");
 						next();
@@ -1073,6 +1079,8 @@ public class Compiler {
 		}
 		else if ( lexer.token == Token.PUBLIC ) {
 			next();
+			if ( lexer.token == Token.VAR )
+				error("Attempt to declare public instance variable");
 		}
 		else if ( lexer.token == Token.OVERRIDE ) {
 			override = true;
