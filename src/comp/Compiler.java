@@ -293,10 +293,12 @@ public class Compiler {
 		else {
 			error("An identifier or identifer: was expected after 'func'");
 		}
+		currMethodReturn = "void";
 		if ( lexer.token == Token.MINUS_GT ) {
 			// method declared a return type
 			lexer.nextToken();
 			rt_type = type();
+			currMethodReturn = rt_type;
 		}
 		if ( atual.getSuperclassName() != null ) {
 			TypeCianetoClass superclass = (TypeCianetoClass) symbolTable.getInGlobal(atual.getSuperclassName());
@@ -505,14 +507,14 @@ public class Compiler {
 
 	private void breakStat() {
 		next();
-
 	}
 
 	private ReturnStat returnStat() {
 		next();
 		Expr expr = expr();
-		if(Type.getStringType(expr.getType()) != currMethodReturn)
-			if(currMethodReturn=="void")
+		System.out.println(Type.getStringType(expr.getType()));
+		if(!Type.getStringType(expr.getType()).equals(currMethodReturn))
+			if(currMethodReturn.equals("void"))
 				error("Current Funcion does not accept return stat");
 			else
 				error("Type error: type of the expression returned is not subclass of the method return type");
@@ -908,10 +910,19 @@ public class Compiler {
 						id1 = lexer.getStringValue();
 						Field field = null;
 						FormalParamDec param = null;
+						MethodList mlist = null;
 						try {
 							field = ((Field) symbolTable.getInFunc(id1));
 						} catch (ClassCastException e) {
 							param = ((FormalParamDec) symbolTable.getInFunc(id1));
+						}
+						//caso nao tenha achado nas vars da func
+						if(field == null && param == null) {
+							try {
+								field = ((Field) symbolTable.getInLocal(id1));
+							} catch (ClassCastException e) {
+								mlist = ((MethodList) symbolTable.getInLocal(id1));
+							}
 						}
 						if ( field != null )
 							id1Type = field.getType();
@@ -984,6 +995,8 @@ public class Compiler {
 				Object member = symbolTable.getInLocal(nameField);
 				if ( member != null )
 						error("Variable '" + nameField + "' is being redeclared");
+				if(nameField.toLowerCase() == "boolean" || nameField.toLowerCase() == "string" || nameField.toLowerCase() == "int")
+						nameField = nameField.toLowerCase();
 				symbolTable.putInLocal(nameField, f);
 				lexer.nextToken();
 				if ( lexer.token == Token.COMMA ) {
